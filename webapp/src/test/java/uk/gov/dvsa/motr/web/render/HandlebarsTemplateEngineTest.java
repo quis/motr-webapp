@@ -7,10 +7,13 @@ import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import uk.gov.dvsa.motr.web.security.CsrfSource;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @RunWith(DataProviderRunner.class)
 public class HandlebarsTemplateEngineTest {
@@ -33,7 +36,7 @@ public class HandlebarsTemplateEngineTest {
     public void assetHelperBuildsPathsCorrectly(String assetsPath, String path, String result) {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine(assetsPath, "12345", "baseUrl");
+                new HandlebarsTemplateEngine(assetsPath, "12345", "baseUrl",  mock(CsrfSource.class));
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("path", path);
@@ -48,7 +51,7 @@ public class HandlebarsTemplateEngineTest {
     public void testEngineCorrectlyFillsContextKey() {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine("/", "12345", "baseUrl");
+                new HandlebarsTemplateEngine("/", "12345", "baseUrl", mock(CsrfSource.class));
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("key", "SomeValueOfTheKey");
@@ -63,7 +66,7 @@ public class HandlebarsTemplateEngineTest {
     public void urlHelperCorrectlyBuildsPathsCorrectly(String basePath, String path, String expectedOutput) {
 
         HandlebarsTemplateEngine instance =
-                new HandlebarsTemplateEngine("someassetPath", "12345", basePath);
+                new HandlebarsTemplateEngine("someassetPath", "12345", basePath, mock(CsrfSource.class));
 
         Map<String, String> context = new HashMap<String, String>();
         context.put("path", path);

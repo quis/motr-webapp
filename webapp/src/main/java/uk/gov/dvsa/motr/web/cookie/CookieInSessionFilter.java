@@ -19,6 +19,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -32,8 +33,10 @@ import javax.ws.rs.ext.Provider;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Date.from;
 
+import static javax.ws.rs.Priorities.AUTHORIZATION;
 import static javax.ws.rs.core.Cookie.DEFAULT_VERSION;
 
+@Priority(AUTHORIZATION + 1)
 @Provider
 public class CookieInSessionFilter implements ContainerResponseFilter, ContainerRequestFilter {
 
@@ -57,7 +60,7 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     public void filter(ContainerRequestContext requestContext) {
 
         try {
-            getSessionFromCookie(requestContext);
+            populateSessionWithCookie(requestContext);
         } catch (Exception e) {
             EventLogger.logErrorEvent(new SessionMalformedEvent(), e);
             throw new NotFoundException();
@@ -67,13 +70,13 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
 
-        storeSessionInCookie(requestContext, responseContext);
+
+        storeSessionInCookie(responseContext);
     }
 
-    private void getSessionFromCookie(ContainerRequestContext requestContext) throws IOException, ClassNotFoundException {
+    private void populateSessionWithCookie(ContainerRequestContext requestContext) throws IOException, ClassNotFoundException {
 
         Cookie sessionCookie = getSessionCookie(requestContext);
-        this.motrSession.clear();
         if (null != sessionCookie) {
             CookieSession cookieSession = (CookieSession) fromString(sessionCookie.getValue());
             if (cookieSession.getAttributes() != null && !cookieSession.getAttributes().isEmpty()) {
@@ -82,14 +85,17 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
         }
     }
 
-    private void storeSessionInCookie(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    private void storeSessionInCookie(ContainerResponseContext responseContext) throws IOException {
 
         CookieSession cookieSession = new CookieSession();
+        /**
+         * CSRF cookie needs to be set as part of session because API Gateway does not allow
+         * to set multiple Set-Cookie headers!
+         */
         this.motrSession.getAttributes().forEach(cookieSession::setAttribute);
 
         responseContext.getHeaders().add("Set-Cookie",
                 getSecureHttpOnlyCookieHeader("session", toString(cookieSession)));
-        this.motrSession.clear();
     }
 
     private String getSecureHttpOnlyCookieHeader(String key, Object value) {
@@ -144,5 +150,4 @@ public class CookieInSessionFilter implements ContainerResponseFilter, Container
         objectInputStream.close();
         return object;
     }
-
 }

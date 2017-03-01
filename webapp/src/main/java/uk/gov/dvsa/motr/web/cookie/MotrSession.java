@@ -3,24 +3,18 @@ package uk.gov.dvsa.motr.web.cookie;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Singleton;
-
-@Singleton
 public class MotrSession {
 
     private static final String VRM_COOKIE_ID = "regNumber";
     private static final String EMAIL_COOKIE_ID = "email";
+    private static final String CSRF = "__csrf";
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
-    private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "UNSUBSCRIBE_CONFIRMATION_PARAMS";
+    private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "unsubscribeConfirmationParams";
 
-    private Map<String, Object> attributes;
+    private Map<String, Object> attributes = new HashMap<>();
 
     private boolean shouldClearCookies;
 
-    public MotrSession() {
-
-        this.attributes = new HashMap<>();
-    }
 
     public void setShouldClearCookies(boolean shouldClearCookies) {
 
@@ -42,6 +36,21 @@ public class MotrSession {
     public UnsubscribeConfirmationParams getUnsubscribeConfirmationParams() {
 
         return (UnsubscribeConfirmationParams) getAttribute(UNSUBSCRIBE_CONFIRMATION_PARAMS);
+    }
+
+    public String getCsrfToken() {
+
+        return getAttribute(CSRF).toString();
+    }
+
+    public boolean hasCsrfToken() {
+
+        return getAttribute(CSRF) != null;
+    }
+
+    public void setCsrfToken(String token) {
+
+        setAttribute(CSRF, token);
     }
 
     public boolean visitingFromReviewPage() {
@@ -90,7 +99,7 @@ public class MotrSession {
         return this.attributes.get(attributeKey);
     }
 
-    protected boolean isShouldClearCookies() {
+    public boolean isShouldClearCookies() {
 
         return shouldClearCookies;
     }
@@ -98,12 +107,6 @@ public class MotrSession {
     protected Map<String, Object> getAttributes() {
 
         return attributes;
-    }
-
-    protected void clear() {
-
-        this.attributes.clear();
-        shouldClearCookies = false;
     }
 
     @Override

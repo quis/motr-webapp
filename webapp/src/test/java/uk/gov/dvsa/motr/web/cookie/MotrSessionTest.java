@@ -110,4 +110,13 @@ public class MotrSessionTest {
         String actual = motrSession.getEmailFromSession();
         assertEquals("", actual);
     }
+
+    @Test
+    public void csrfManipulationIsCorrect() {
+
+        assertFalse(motrSession.hasCsrfToken());
+        motrSession.setCsrfToken("token");
+        assertEquals("token", motrSession.getCsrfToken());
+        assertTrue(motrSession.hasCsrfToken());
+    }
 }

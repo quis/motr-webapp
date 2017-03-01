@@ -11,8 +11,7 @@ public class TemplateEngineBinder extends AbstractBinder {
 
     @Override
     protected void configure() {
-        bind(HandlebarsTemplateEngine.class)
-                .to(TemplateEngine.class)
-                .in(Singleton.class);
+        bind(HandlebarsTemplateEngine.class).to(TemplateEngine.class).in(Singleton.class);
     }
+
 }

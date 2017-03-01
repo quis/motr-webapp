@@ -11,8 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
+import uk.gov.dvsa.motr.web.security.CsrfSource;
 
 import java.io.IOException;
+
+import javax.inject.Inject;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.BASE_URL;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.STATIC_ASSETS_HASH;
@@ -25,13 +28,16 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
     private static final String ASSETS_HELPER_NAME = "asset";
     private static final String REQUEST_ID_HELPER_NAME = "requestId";
     private static final String URL_HELPER = "url";
+    private static final String CSRF_HELPER = "csrf";
 
     private final Handlebars handlebars;
 
+    @Inject
     public HandlebarsTemplateEngine(
             @SystemVariableParam(STATIC_ASSETS_URL) String assetsRootPath,
             @SystemVariableParam(STATIC_ASSETS_HASH) String assetsHash,
-            @SystemVariableParam(BASE_URL) String baseUrl
+            @SystemVariableParam(BASE_URL) String baseUrl,
+            CsrfSource csrfSource
     ) {
 
         TemplateLoader loader = new ClassPathTemplateLoader();
@@ -43,6 +49,7 @@ public class HandlebarsTemplateEngine implements TemplateEngine {
                 .registerHelper(ASSETS_HELPER_NAME, assetsHelper(assetsPathFormat, assetsHash))
                 .registerHelper(REQUEST_ID_HELPER_NAME, (context, options) -> MDC.get("AWSRequestId"))
                 .registerHelper(URL_HELPER, urlHelper(baseUrl))
+                .registerHelper(CSRF_HELPER, (context, options) -> csrfSource.getToken())
                 .with(new ConcurrentMapTemplateCache());
 
 

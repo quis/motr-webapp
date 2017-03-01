@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import javax.inject.Inject;
@@ -16,18 +17,22 @@ import static java.util.Collections.emptyMap;
 public class EmailConfirmationPendingResource {
 
     private final TemplateEngine renderer;
+    private final MotrSession session;
 
     @Inject
     public EmailConfirmationPendingResource(
-            TemplateEngine renderer
+            TemplateEngine renderer,
+            MotrSession session
     ) {
 
         this.renderer = renderer;
+        this.session = session;
     }
 
     @GET
     public String confirmEmailGet() {
 
+        session.setShouldClearCookies(true);
         return renderer.render("email-confirmation-pending", emptyMap());
     }
 }

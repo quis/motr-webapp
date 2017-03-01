@@ -13,6 +13,7 @@
     {{/message}}
 
     <form method="POST" autocomplete="off" novalidate="">
+        <input name="__csrf" value="{{{csrf this}}}" type="hidden"/>
         <fieldset>
             <div class="form-group {{#message}}has-error{{/message}}">
                 <label for="textStandard" class="form-label">
