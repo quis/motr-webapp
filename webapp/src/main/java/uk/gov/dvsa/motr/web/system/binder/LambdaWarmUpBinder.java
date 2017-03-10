@@ -11,7 +11,6 @@ import uk.gov.dvsa.motr.web.performance.warmup.DefaultLambdaWarmUp;
 import uk.gov.dvsa.motr.web.performance.warmup.LambdaWarmUp;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.system.binder.factory.BaseFactory;
-import uk.gov.service.notify.NotificationClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import static uk.gov.dvsa.motr.web.system.SystemVariable.DO_WARM_UP;
-import static uk.gov.dvsa.motr.web.system.SystemVariable.GOV_NOTIFY_API_TOKEN;
+import static uk.gov.dvsa.motr.web.system.SystemVariable.MOT_TEST_REMINDER_INFO_TOKEN;
 import static uk.gov.dvsa.motr.web.system.SystemVariable.WARM_UP_TIMEOUT_SEC;
 
 public class LambdaWarmUpBinder extends AbstractBinder {
@@ -90,41 +89,19 @@ public class LambdaWarmUpBinder extends AbstractBinder {
 
                 return null;
             });
-
-            tasks.add(() -> {
-
-                logger.debug("Warming up vehicle details client - start");
-
-                vehicleDetailsClientProvider.get().fetch("__someVRM");
-
-                logger.debug("Warming up vehicle details client - end");
-
-                return null;
-            });
             
             tasks.add(() -> {
 
                 logger.debug("Warming up notify api key - start");
 
-                String decrypted = config.getValue(GOV_NOTIFY_API_TOKEN);
+                String decrypted = config.getValue(MOT_TEST_REMINDER_INFO_TOKEN);
 
                 logger.debug("Warming up notify api key - end {}", decrypted);
 
                 return null;
 
             });
-
-            tasks.add(() -> {
-
-                logger.debug("Warming up notify client - start");
-
-                new NotificationClient("WARM_UP").getNotificationById("");
-
-                logger.debug("Warming up notify client - end");
-
-                return null;
-            });
-
+            
             return tasks;
         }
     }
