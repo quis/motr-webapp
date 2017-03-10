@@ -15,10 +15,10 @@ public class DefaultLambdaWarmUpTest {
         warmUpWithin1Second(singletonList(taskWithDurationMs(500)));
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void warmUpExecutesWithoutError() throws Exception {
 
-        warmUpWithin1Second(singletonList(taskWithDurationMs(2_000)));
+        warmUpWithin1Second(singletonList(taskWithDurationMs(3_000)));
     }
 
     private Callable taskWithDurationMs(int millis) throws Exception {

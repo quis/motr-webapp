@@ -35,9 +35,8 @@ public class DefaultLambdaWarmUp implements LambdaWarmUp {
 
             ExecutorService warmUpExecutor = Executors.newCachedThreadPool();
             tasks.forEach(warmUpExecutor::submit);
-            warmUpExecutor.shutdown();
-
             warmUpExecutor.awaitTermination(warmUpTimeoutSeconds, SECONDS);
+            warmUpExecutor.shutdownNow();
 
         } catch (InterruptedException exception) {
 
