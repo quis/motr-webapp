@@ -33,7 +33,7 @@ public class DefaultLambdaWarmUp implements LambdaWarmUp {
 
         try {
 
-            ExecutorService warmUpExecutor = Executors.newCachedThreadPool();
+            ExecutorService warmUpExecutor = Executors.newFixedThreadPool(tasks.size());
             tasks.forEach(warmUpExecutor::submit);
             warmUpExecutor.shutdown();
 

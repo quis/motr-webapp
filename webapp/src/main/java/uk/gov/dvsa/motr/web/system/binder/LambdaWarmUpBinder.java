@@ -101,7 +101,7 @@ public class LambdaWarmUpBinder extends AbstractBinder {
                 return null;
 
             });
-            
+
             return tasks;
         }
     }
