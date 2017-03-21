@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
-import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
+import uk.gov.dvsa.motr.web.viewmodel.ViewModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,15 +19,13 @@ import static org.mockito.Mockito.when;
 public class EmailResourceTest {
 
     private MotrSession motrSession;
-    private TemplateEngineStub engine;
     private EmailResource resource;
 
     @Before
     public void setup() {
 
         motrSession = mock(MotrSession.class);
-        engine = new TemplateEngineStub();
-        resource = new EmailResource(motrSession, engine);
+        resource = new EmailResource(motrSession);
         when(motrSession.getEmailFromSession()).thenReturn("test@test.com");
     }
 
@@ -35,21 +33,21 @@ public class EmailResourceTest {
     public void emailTemplateIsRenderedOnGet() throws Exception {
 
         when(motrSession.isAllowedOnEmailPage()).thenReturn(true);
-        assertEquals(200, resource.emailPage().getStatus());
-        assertEquals("email", engine.getTemplate());
+        ViewModel vm = (ViewModel)resource.emailPage();
+        assertEquals("email", vm.getTemplate());
 
         Map<String, String> expectedMap = new HashMap<>();
         expectedMap.put("back_url", "vrm");
         expectedMap.put("continue_button_text", "Continue");
         expectedMap.put("back_button_text", "Back");
         expectedMap.put("email", "test@test.com");
-        assertEquals(expectedMap.toString(), engine.getContext(Map.class).toString());
+        assertEquals(expectedMap.toString(), vm.getContextMap().toString());
     }
 
     @Test
     public void onPostWithValid_ThenRedirectedToReviewPage() throws Exception {
 
-        Response response = resource.emailPagePost("test@test.com");
+        Response response = (Response)resource.emailPagePost("test@test.com");
         assertEquals(302, response.getStatus());
     }
 
@@ -64,10 +62,9 @@ public class EmailResourceTest {
         expectedContext.put("back_button_text", "Back");
         expectedContext.put("dataLayer", "{\"error\":\"" + EmailValidator.EMAIL_INVALID_MESSAGE + "\"}");
 
-        Response response = resource.emailPagePost("invalidEmail");
-        assertEquals(200, response.getStatus());
-        assertEquals("email", engine.getTemplate());
-        assertEquals(expectedContext, engine.getContext(Map.class));
+        ViewModel vm = (ViewModel) resource.emailPagePost("invalidEmail");
+        assertEquals("email", vm.getTemplate());
+        assertEquals(expectedContext, vm.getContextMap());
     }
 
     @Test
@@ -81,9 +78,8 @@ public class EmailResourceTest {
         expectedContext.put("back_button_text", "Back");
         expectedContext.put("dataLayer", "{\"error\":\"" + EmailValidator.EMAIL_EMPTY_MESSAGE + "\"}");
 
-        Response response = resource.emailPagePost("");
-        assertEquals(200, response.getStatus());
-        assertEquals("email", engine.getTemplate());
-        assertEquals(expectedContext, engine.getContext(Map.class));
+        ViewModel vm = (ViewModel)resource.emailPagePost("");
+        assertEquals("email", vm.getTemplate());
+        assertEquals(expectedContext, vm.getContextMap());
     }
 }
