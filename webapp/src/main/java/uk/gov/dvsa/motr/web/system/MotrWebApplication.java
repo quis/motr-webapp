@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.system;
 
 import org.glassfish.jersey.server.ResourceConfig;
 
+import uk.gov.dvsa.motr.web.httpcache.CacheDynamicFeature;
 import uk.gov.dvsa.motr.web.system.binder.ConfigBinder;
 import uk.gov.dvsa.motr.web.system.binder.LambdaWarmUpBinder;
 import uk.gov.dvsa.motr.web.system.binder.RepositoryBinder;
@@ -23,5 +24,6 @@ public class MotrWebApplication extends ResourceConfig {
         register(new RepositoryBinder());
         register(new SessionBinder());
         register(new LambdaWarmUpBinder());
+        register(CacheDynamicFeature.class);
     }
 }
