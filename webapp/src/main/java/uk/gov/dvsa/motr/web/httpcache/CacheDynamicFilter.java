@@ -14,7 +14,7 @@ public class CacheDynamicFilter implements ContainerResponseFilter {
 
         if (responseContext.getEntity() instanceof String) {
             String entity = (String) responseContext.getEntity();
-            responseContext.getHeaders().add("Cache-Control", "public, max-age=60, s-maxage=60, must-revalidate");
+            responseContext.getHeaders().add("Cache-Control", "public, max-age=60, s-maxage=60");
         }
     }
 }
