@@ -29,7 +29,7 @@ public class MotrWebHandlerNotFoundTest {
         // @formatter:off
         return new Object[][]{
                 {"/resource-that-does-not-exist"},
-                {"/not-found"},
+                {"/home"},
         };
     }
     // @formatter:on

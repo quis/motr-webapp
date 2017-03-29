@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.resource;
 
 
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.httpcache.CacheDynamic;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ public class HomepageResource {
         this.renderer = renderer;
     }
 
+    @CacheDynamic
     @GET
     public String homePage() throws Exception {
 
