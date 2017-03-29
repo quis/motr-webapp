@@ -1,7 +1,5 @@
 package uk.gov.dvsa.motr.web.httpcache;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -16,7 +14,7 @@ public class CacheDynamicFilter implements ContainerResponseFilter {
 
         if (responseContext.getEntity() instanceof String) {
             String entity = (String) responseContext.getEntity();
-            responseContext.getHeaders().add("ETag", DigestUtils.md5Hex(entity));
+            responseContext.getHeaders().add("Cache-Control", "public, max-age=60, s-maxage=60, must-revalidate");
         }
     }
 }
