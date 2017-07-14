@@ -9,7 +9,7 @@ class RandomIdGenerator {
 
     static String generateId() {
 
-        return encodeBase64URLSafeString(cryptoStrongRandomBytes(16));
+        return encodeBase64URLSafeString(cryptoStrongRandomBytes(64));
     }
 
     private static byte[] cryptoStrongRandomBytes(int size) {
