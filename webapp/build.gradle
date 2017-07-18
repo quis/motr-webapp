@@ -122,9 +122,11 @@ task integrationTest(type: Test) {
 // enhanced logging for test phases
 tasks.withType(Test) {
     testLogging {
-        events = [TestLogEvent.SKIPPED,
-                  TestLogEvent.FAILED]
-        showStandardStreams = false
+        events = [TestLogEvent.PASSED,
+                  TestLogEvent.SKIPPED,
+                  TestLogEvent.FAILED,
+                  TestLogEvent.STANDARD_OUT]
+        showStandardStreams = true
         exceptionFormat = TestExceptionFormat.FULL
         showExceptions = true
         showStackTraces = true
