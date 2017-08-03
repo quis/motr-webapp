@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.web.component.subscription.model;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+
 import java.time.LocalDate;
 
 public class PendingSubscription {
@@ -12,6 +14,10 @@ public class PendingSubscription {
 
     private LocalDate motDueDate;
 
+    private MotIdentification motIdentification;
+
+    private String dvlaId;
+
     private String motTestNumber;
 
     public String getConfirmationId() {
@@ -22,7 +28,6 @@ public class PendingSubscription {
         this.confirmationId = id;
         return this;
     }
-
 
     public String getVrm() {
         return vrm;
@@ -51,12 +56,22 @@ public class PendingSubscription {
         return this;
     }
 
-    public String getMotTestNumber() {
-        return this.motTestNumber;
+    public MotIdentification getMotIdentification() {
+        return motIdentification;
     }
 
-    public PendingSubscription setMotTestNumber(String motTestNumber) {
-        this.motTestNumber = motTestNumber;
+    public PendingSubscription setMotIdentification(MotIdentification motIdentification) {
+        this.motIdentification = motIdentification;
         return this;
+    }
+
+    public void setDvlaId(String dvlaId) {
+        this.dvlaId = dvlaId;
+        this.motIdentification = new MotIdentification(this.motTestNumber, dvlaId);
+    }
+
+    public void setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
+        this.motIdentification = new MotIdentification(motTestNumber, this.dvlaId);
     }
 }

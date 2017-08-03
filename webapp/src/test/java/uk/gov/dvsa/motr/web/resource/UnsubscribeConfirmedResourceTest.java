@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.UnsubscribeConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
@@ -14,23 +15,32 @@ import java.util.Map;
 import javax.ws.rs.NotFoundException;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UnsubscribeConfirmedResourceTest {
 
     private static final TemplateEngineStub TEMPLATE_ENGINE_STUB = new TemplateEngineStub();
+    private static final String MOT_TEST_NUMBER = "123456";
 
     private UnsubscribeConfirmedResource resource;
+    private MotrSession motrSession = mock(MotrSession.class);
 
     @Before
     public void setUp() {
 
-        MotrSession motrSession = new MotrSession();
         UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
 
         params.setExpiryDate(LocalDate.of(2015, 7, 10).toString());
         params.setRegistration("TEST-VRM");
         params.setEmail("test@this-is-a-test-123");
-        motrSession.setUnsubscribeConfirmationParams(params);
+
+        when(motrSession.getUnsubscribeConfirmationParams()).thenReturn(params);
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMotTestNumber(MOT_TEST_NUMBER);
+
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
 
         this.resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, motrSession);
     }

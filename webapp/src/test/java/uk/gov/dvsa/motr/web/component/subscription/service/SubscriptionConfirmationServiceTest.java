@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
@@ -35,6 +36,7 @@ public class SubscriptionConfirmationServiceTest {
     private static final LocalDate DATE = LocalDate.now();
     private static final String VRM = "vrm";
     private static final String EMAIL = "email";
+    private static final String MOT_TEST_NUMBER = "12345";
 
     private SubscriptionConfirmationService subscriptionService;
 
@@ -64,7 +66,8 @@ public class SubscriptionConfirmationServiceTest {
                 eq(pendingSubscription.getEmail()),
                 eq(pendingSubscription.getVrm()),
                 eq(pendingSubscription.getMotDueDate()),
-                anyString()
+                anyString(),
+                any(MotIdentification.class)
         );
     }
 
@@ -91,5 +94,10 @@ public class SubscriptionConfirmationServiceTest {
                 .setMotDueDate(DATE)
                 .setEmail(EMAIL)
                 .setVrm(VRM);
+    }
+
+    private MotIdentification motIdentificationStub() {
+
+        return new MotIdentification(MOT_TEST_NUMBER, null);
     }
 }

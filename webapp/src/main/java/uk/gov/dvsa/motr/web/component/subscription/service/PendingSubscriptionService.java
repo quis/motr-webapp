@@ -2,6 +2,7 @@ package uk.gov.dvsa.motr.web.component.subscription.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
@@ -38,7 +39,7 @@ public class PendingSubscriptionService {
         this.urlHelper = urlHelper;
     }
 
-    public String handlePendingSubscriptionCreation(String vrm, String email, LocalDate motDueDate, String motTestNumber) {
+    public String handlePendingSubscriptionCreation(String vrm, String email, LocalDate motDueDate, MotIdentification motIdentification) {
 
         Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
 
@@ -47,7 +48,7 @@ public class PendingSubscriptionService {
 
             return urlHelper.emailConfirmedNthTimeLink();
         } else {
-            createPendingSubscription(vrm, email, motDueDate, generateId(), motTestNumber);
+            createPendingSubscription(vrm, email, motDueDate, generateId(), motIdentification);
 
             return urlHelper.emailConfirmationPendingLink();
         }
@@ -58,28 +59,31 @@ public class PendingSubscriptionService {
      * @param vrm        subscription vrm
      * @param email      subscription email
      * @param motDueDate most recent mot due date
-     * @param motTestNumber
+     * @param confirmationId confirmation id
+     * @param motIdentification the identifier for this vehicle (may be dvla id or mot test number)
      */
-    public void createPendingSubscription(String vrm, String email, LocalDate motDueDate, String confirmationId, String motTestNumber) {
+    public void createPendingSubscription(String vrm, String email, LocalDate motDueDate,
+            String confirmationId, MotIdentification motIdentification) {
 
         PendingSubscription pendingSubscription = new PendingSubscription()
                 .setConfirmationId(confirmationId)
                 .setEmail(email)
                 .setVrm(vrm)
                 .setMotDueDate(motDueDate)
-                .setMotTestNumber(motTestNumber);
+                .setMotIdentification(motIdentification);
 
         try {
             pendingSubscriptionRepository.save(pendingSubscription);
             notifyService.sendEmailAddressConfirmationEmail(email, urlHelper.confirmEmailLink(pendingSubscription.getConfirmationId()));
+
             EventLogger.logEvent(
                     new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
-                    .setMotTestNumber(motTestNumber)
+                    .setMotIdentification(motIdentification)
             );
         } catch (Exception e) {
             EventLogger.logErrorEvent(
                     new PendingSubscriptionCreationFailedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
-                    .setMotTestNumber(motTestNumber), e);
+                    .setMotIdentification(motIdentification), e);
             throw e;
         }
     }

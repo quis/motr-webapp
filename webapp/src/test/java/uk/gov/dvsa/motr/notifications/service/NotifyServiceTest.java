@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.notifications.service;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.helper.DateDisplayHelper;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -29,6 +30,7 @@ public class NotifyServiceTest {
     private String registrationNumber = "testreg";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
     private String unsubscribeLink = "https://gov.uk";
+    private static final String MOT_TEST_NUMBER = "12345";
 
     @Before
     public void setUp() {
@@ -43,7 +45,7 @@ public class NotifyServiceTest {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
 
-        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink, motIdentificationStub());
 
         verify(CLIENT, times(1)).sendEmail(templateId, email, personalisationMap, "");
     }
@@ -53,7 +55,7 @@ public class NotifyServiceTest {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, registrationNumber, motExpiryDate, unsubscribeLink, motIdentificationStub());
     }
 
     private Map<String, String> stubPersonalisationMap(String registrationNumber, LocalDate expiryDate, String link) {
@@ -61,6 +63,13 @@ public class NotifyServiceTest {
         map.put("registration_number", registrationNumber);
         map.put("mot_expiry_date", DateDisplayHelper.asDisplayDate(expiryDate));
         map.put("unsubscribe_link", link);
+        map.put("is_due_or_expires", "expires");
+        map.put("due_or_expiry", "expiry");
         return map;
+    }
+
+    private MotIdentification motIdentificationStub() {
+
+        return new MotIdentification(MOT_TEST_NUMBER, null);
     }
 }

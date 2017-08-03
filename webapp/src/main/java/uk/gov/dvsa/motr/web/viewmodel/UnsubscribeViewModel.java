@@ -9,6 +9,7 @@ public class UnsubscribeViewModel {
     private String registration;
     private String email;
     private LocalDate expiryDate;
+    private boolean isDvlaVehicle;
 
     public String getRegistration() {
         return registration;
@@ -43,6 +44,17 @@ public class UnsubscribeViewModel {
     public UnsubscribeViewModel setExpiryDate(LocalDate expiryDate) {
 
         this.expiryDate = expiryDate;
+        return this;
+    }
+
+    public boolean isDvlaVehicle() {
+
+        return isDvlaVehicle;
+    }
+
+    public UnsubscribeViewModel setDvlaVehicle(boolean dvlaVehicle) {
+
+        isDvlaVehicle = dvlaVehicle;
         return this;
     }
 }
