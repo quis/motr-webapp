@@ -9,6 +9,7 @@ public class UnsubscribeViewModel {
     private String registration;
     private String email;
     private LocalDate expiryDate;
+    private boolean isDvlaVehicle;
     private String makeModel;
 
     public String getRegistration() {
@@ -55,6 +56,17 @@ public class UnsubscribeViewModel {
     public UnsubscribeViewModel setMakeModel(String makeModel) {
 
         this.makeModel = makeModel;
+        return this;
+    }
+
+    public boolean isDvlaVehicle() {
+
+        return isDvlaVehicle;
+    }
+
+    public UnsubscribeViewModel setDvlaVehicle(boolean dvlaVehicle) {
+
+        isDvlaVehicle = dvlaVehicle;
         return this;
     }
 }

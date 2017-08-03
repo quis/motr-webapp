@@ -9,6 +9,7 @@ public class SubscriptionConfirmationViewModel {
     private String vrm;
     private LocalDate expiryDate;
     private String email;
+    private boolean isDvlaVehicle;
 
     public String getVrm() {
 
@@ -40,6 +41,17 @@ public class SubscriptionConfirmationViewModel {
     public SubscriptionConfirmationViewModel setEmail(String email) {
 
         this.email = email;
+        return this;
+    }
+
+    public boolean isDvlaVehicle() {
+
+        return isDvlaVehicle;
+    }
+
+    public SubscriptionConfirmationViewModel setDvlaVehicle(boolean dvlaVehicle) {
+
+        isDvlaVehicle = dvlaVehicle;
         return this;
     }
 }

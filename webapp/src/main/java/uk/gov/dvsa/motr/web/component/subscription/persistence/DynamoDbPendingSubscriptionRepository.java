@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
@@ -40,7 +41,6 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
             @SystemVariableParam(REGION) String region) {
 
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
-
         this.dynamoDb = new DynamoDB(client);
         this.tableName = tableName;
     }
@@ -55,6 +55,7 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
         Index table = dynamoDb.getTable(tableName).getIndex("id-gsi");
 
         ItemCollection<QueryOutcome> items = table.query(query);
+
         Iterator<Item> resultIterator = items.iterator();
 
         if (!resultIterator.hasNext()) {
@@ -63,20 +64,10 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
 
         Item item = resultIterator.next();
 
-        return Optional.of(mapItemToSubscription(item));
+        return Optional.of(mapItemToPendingSubscription(item));
     }
 
-    private PendingSubscription mapItemToSubscription(Item item) {
-
-        PendingSubscription subscription = new PendingSubscription();
-        subscription.setConfirmationId(item.getString("id"));
-        subscription.setVrm(item.getString("vrm"));
-        subscription.setEmail(item.getString("email"));
-        subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
-        subscription.setMotTestNumber(item.getString("mot_test_number"));
-        return subscription;
-    }
-
+    @Override
     public void save(PendingSubscription subscription) {
 
         Item item = new Item()
@@ -85,14 +76,20 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
-                .withString("mot_test_number", subscription.getMotTestNumber())
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+
+
+
+        subscription.getMotIdentification().getMotTestNumber()
+                .ifPresent(motTestNumber -> item.withString("mot_test_number", motTestNumber));
+        subscription.getMotIdentification().getDvlaId().ifPresent(dvlaId -> item.withString("dvla_id", dvlaId));
 
         dynamoDb.getTable(tableName).putItem(item);
     }
 
     @Override
     public void delete(PendingSubscription subscription) {
+
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
         Map<String, Object> expressionAttributeValues = new HashMap<>();
         expressionAttributeValues.put(":id", subscription.getConfirmationId());
@@ -103,5 +100,16 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
                 null,
                 expressionAttributeValues
         );
+    }
+
+    private PendingSubscription mapItemToPendingSubscription(Item item) {
+
+        PendingSubscription subscription = new PendingSubscription();
+        subscription.setConfirmationId(item.getString("id"));
+        subscription.setVrm(item.getString("vrm"));
+        subscription.setEmail(item.getString("email"));
+        subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
+        subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
+        return subscription;
     }
 }

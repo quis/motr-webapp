@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.notifications.service;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -29,6 +30,7 @@ public class NotifyServiceTest {
     private String vehicleDetails = "TEST-MAKE TEST-MODEL, TEST-REG";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
     private String unsubscribeLink = "https://gov.uk";
+    private static final String MOT_TEST_NUMBER = "12345";
 
     @Before
     public void setUp() {
@@ -43,7 +45,7 @@ public class NotifyServiceTest {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenReturn(mock(SendEmailResponse.class));
 
-        this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink, motIdentificationStub());
 
         verify(CLIENT, times(1)).sendEmail(templateId, email, personalisationMap, "");
     }
@@ -53,7 +55,7 @@ public class NotifyServiceTest {
 
         when(CLIENT.sendEmail(any(), any(), any(), any())).thenThrow(NotificationClientException.class);
 
-        this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink);
+        this.service.sendSubscriptionConfirmationEmail(email, vehicleDetails, motExpiryDate, unsubscribeLink, motIdentificationStub());
     }
 
     private Map<String, String> stubPersonalisationMap(String vehicleDetails, LocalDate expiryDate, String link) {
@@ -61,6 +63,12 @@ public class NotifyServiceTest {
         map.put("vehicle_details", vehicleDetails);
         map.put("mot_expiry_date", DateFormatter.asDisplayDate(expiryDate));
         map.put("unsubscribe_link", link);
+        map.put("is_due_or_expires", "expires");
         return map;
+    }
+
+    private MotIdentification motIdentificationStub() {
+
+        return new MotIdentification(MOT_TEST_NUMBER, null);
     }
 }

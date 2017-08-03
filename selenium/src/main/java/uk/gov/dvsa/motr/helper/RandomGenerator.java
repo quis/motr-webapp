@@ -17,4 +17,9 @@ public class RandomGenerator {
         return RandomStringUtils.randomAlphabetic(10).toUpperCase();
     }
 
+    public static String generateDvlaVrm() {
+
+        return "DVLA-ID-" + RandomStringUtils.randomAlphabetic(5).toUpperCase();
+    }
+
 }

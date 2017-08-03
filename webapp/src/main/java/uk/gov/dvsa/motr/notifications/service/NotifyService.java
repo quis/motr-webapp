@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.notifications.service;
 
 import uk.gov.dvsa.motr.eventlog.EventLogger;
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent;
 import uk.gov.dvsa.motr.web.formatting.DateFormatter;
 import uk.gov.service.notify.NotificationClient;
@@ -34,13 +35,20 @@ public class NotifyService {
             String emailAddress,
             String vehicleDetails,
             LocalDate motExpiryDate,
-            String unsubscribeLink
+            String unsubscribeLink,
+            MotIdentification motIdentification
     ) {
 
         Map<String, String> personalisation = new HashMap<>();
         personalisation.put("vehicle_details", vehicleDetails);
         personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
         personalisation.put("unsubscribe_link", unsubscribeLink);
+
+        if (motIdentification.getDvlaId().isPresent()) {
+            personalisation.put("is_due_or_expires", "is due");
+        } else {
+            personalisation.put("is_due_or_expires", "expires");
+        }
 
         try {
 

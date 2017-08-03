@@ -24,20 +24,27 @@ import static org.mockito.Mockito.when;
 public class UnsubscribeConfirmedResourceTest {
 
     private static final TemplateEngineStub TEMPLATE_ENGINE_STUB = new TemplateEngineStub();
+    private static final String MOT_TEST_NUMBER = "123456";
 
     private UnsubscribeConfirmedResource resource;
     private VehicleDetailsClient client = mock(VehicleDetailsClient.class);
+    private MotrSession motrSession = mock(MotrSession.class);
 
     @Before
     public void setUp() {
 
-        MotrSession motrSession = new MotrSession();
         UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
 
         params.setExpiryDate(LocalDate.of(2015, 7, 10).toString());
         params.setRegistration("TEST-VRM");
         params.setEmail("test@this-is-a-test-123");
-        motrSession.setUnsubscribeConfirmationParams(params);
+
+        when(motrSession.getUnsubscribeConfirmationParams()).thenReturn(params);
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMotTestNumber(MOT_TEST_NUMBER);
+
+        when(motrSession.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
 
         this.resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, motrSession, client);
     }
@@ -45,7 +52,6 @@ public class UnsubscribeConfirmedResourceTest {
     @Test(expected = NotFoundException.class)
     public void unsubscribeConfirmedWillThrow404WhenSessionIsEmpty() throws Exception {
 
-        when(client.fetch(eq("TEST-VRM"))).thenReturn(Optional.of(new VehicleDetails()));
         resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, new MotrSession(), client);
         resource.unsubscribeConfirmed();
     }

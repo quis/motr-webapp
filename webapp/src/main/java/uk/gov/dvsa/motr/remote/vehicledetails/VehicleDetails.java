@@ -35,7 +35,12 @@ public class VehicleDetails implements Serializable {
     private LocalDate motExpiryDate;
 
     @JsonProperty("motTestNumber")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String motTestNumber;
+
+    @JsonProperty("dvlaId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String dvlaId;
 
     public String getMake() {
 
@@ -117,9 +122,22 @@ public class VehicleDetails implements Serializable {
         this.motTestNumber = motTestNumber;
     }
 
+    public String getDvlaId() {
+
+        return dvlaId;
+    }
+
+    public void setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
+    }
+
+    public MotIdentification getMotIdentification() {
+        return new MotIdentification(this.motTestNumber, this.dvlaId);
+    }
+
     @Override
     public String toString() {
-
         return "VehicleDetails{" +
                 "make='" + make + '\'' +
                 ", model='" + model + '\'' +
@@ -129,6 +147,7 @@ public class VehicleDetails implements Serializable {
                 ", yearOfManufacture=" + yearOfManufacture +
                 ", motExpiryDate=" + motExpiryDate +
                 ", motTestNumber='" + motTestNumber + '\'' +
+                ", dvlaId='" + dvlaId + '\'' +
                 '}';
     }
 }

@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 public class ReviewViewModel {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ReviewViewModel.class);
+
     private static String UNKNOWN_STRING = "Unknown";
 
     private String registration;
@@ -14,6 +16,7 @@ public class ReviewViewModel {
     private String colour;
     private String yearOfManufacture;
     private LocalDate expiryDate;
+    private boolean isDvlaVehicle;
 
     public String getRegistration() {
         return registration;
@@ -101,6 +104,18 @@ public class ReviewViewModel {
     public ReviewViewModel setExpiryDate(LocalDate expiryDate) {
 
         this.expiryDate = expiryDate;
+        return this;
+    }
+
+    public boolean isDvlaVehicle() {
+
+        return isDvlaVehicle;
+    }
+
+    public ReviewViewModel setDvlaVehicle(boolean dvlaVehicle) {
+
+        logger.info("ReviewViewModel setDvlaVehicle to: " + dvlaVehicle);
+        isDvlaVehicle = dvlaVehicle;
         return this;
     }
 }

@@ -63,12 +63,15 @@ public class ReviewResource {
         VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
 
         if (null != vehicle) {
+            logger.info("review page resource vehicle.getMotIdentification().getDvlaId().isPresent() has value: " +
+                    vehicle.getMotIdentification().getDvlaId().isPresent());
             viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
                     .setEmail(emailFromSession)
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMakeModel(vehicle.getMake(), vehicle.getModel())
                     .setRegistration(regNumberFromSession)
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
+            map.put("isDvlaVehicle", vehicle.getMotIdentification().getDvlaId().isPresent());
         } else {
             logger.debug("vehicle is null on get request");
             throw new NotFoundException();
@@ -77,6 +80,7 @@ public class ReviewResource {
         this.motrSession.setVisitingFromReview(true);
 
         map.put("viewModel", viewModel);
+
         return Response.ok(renderer.render("review", map)).build();
     }
 
@@ -90,7 +94,7 @@ public class ReviewResource {
         if (detailsAreValid(vrm, email) && null != vehicle) {
             LocalDate expiryDate = vehicle.getMotExpiryDate();
             String redirectUri =
-                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate, vehicle.getMotTestNumber());
+                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm, email, expiryDate, vehicle.getMotIdentification());
 
             return redirectToSuccessScreen(redirectUri, email);
         } else {

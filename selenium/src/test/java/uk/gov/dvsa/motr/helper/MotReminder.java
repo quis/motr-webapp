@@ -47,7 +47,7 @@ public class MotReminder {
         return PageNavigator.goTo(UnsubscribeErrorPage.class, unsubscribeId);
     }
 
-    public SubscriptionConfirmationPage subscribeToReminderAndConfrimEmail(String vrm, String email) {
+    public SubscriptionConfirmationPage subscribeToReminderAndConfirmEmail(String vrm, String email) {
 
         enterAndConfirmPendingReminderDetails(vrm, email);
 

@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.web.eventlog.subscription;
 
 import uk.gov.dvsa.motr.eventlog.Event;
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,8 +26,13 @@ public abstract class PendingSubscriptionEvent extends Event {
         return this;
     }
 
-    public PendingSubscriptionEvent setMotTestNumber(String motTestNumber) {
-        params.put("mot-test-number", motTestNumber);
+    public PendingSubscriptionEvent setMotIdentification(MotIdentification motIdentification) {
+
+        if (motIdentification.getMotTestNumber().isPresent()) {
+            params.put("mot-test-number", motIdentification.getMotTestNumber().get());
+        } else {
+            params.put("dvla-id", motIdentification.getDvlaId().get());
+        }
         return this;
     }
 }

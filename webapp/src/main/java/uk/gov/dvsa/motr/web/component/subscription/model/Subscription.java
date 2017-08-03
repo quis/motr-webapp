@@ -1,5 +1,7 @@
 package uk.gov.dvsa.motr.web.component.subscription.model;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
+
 import java.time.LocalDate;
 
 public class Subscription {
@@ -12,7 +14,7 @@ public class Subscription {
 
     private LocalDate motDueDate;
 
-    private String motTestNumber;
+    private MotIdentification motIdentification;
 
     public String getUnsubscribeId() {
         return unsubscribeId;
@@ -50,12 +52,12 @@ public class Subscription {
         return this;
     }
 
-    public String getMotTestNumber() {
-        return this.motTestNumber;
+    public MotIdentification getMotIdentification() {
+        return motIdentification;
     }
 
-    public Subscription setMotTestNumber(String motTestNumber) {
-        this.motTestNumber = motTestNumber;
+    public Subscription setMotIdentification(MotIdentification motIdentification) {
+        this.motIdentification = motIdentification;
         return this;
     }
 }

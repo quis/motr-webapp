@@ -8,10 +8,10 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.CancelledSubscriptionItem;
 import uk.gov.dvsa.motr.web.component.subscription.model.CancelledSubscription;
-import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,29 +35,61 @@ public class DynamoDbCancelledSubscriptionRepositoryTest {
     }
 
     @Test
-    public void saveCancelledSubscriptionCorrectlySavesNonModelAttributesToDb() {
+    public void saveCancelledSubscriptionForMotVehicle_CorrectlySavesNonModelAttributesToDb() {
 
-        CancelledSubscriptionItem cancelledSubscriptionItem = new CancelledSubscriptionItem();
+        CancelledSubscriptionItem cancelledSubscriptionItemForMotVehicle = new CancelledSubscriptionItem();
 
-        CancelledSubscription cancelledSubscription = new CancelledSubscription();
-        cancelledSubscription
-                .setUnsubscribeId(cancelledSubscriptionItem.getUnsubscribeId())
-                .setEmail(cancelledSubscriptionItem.getEmail())
-                .setVrm(cancelledSubscriptionItem.getVrm())
-                .setMotTestNumber(cancelledSubscriptionItem.getMotTestNumber())
+        MotIdentification motIdentification = new MotIdentification(cancelledSubscriptionItemForMotVehicle.getMotTestNumber(), null);
+
+        CancelledSubscription cancelledSubscriptionForMotVehicle = new CancelledSubscription();
+        cancelledSubscriptionForMotVehicle
+                .setUnsubscribeId(cancelledSubscriptionItemForMotVehicle.getUnsubscribeId())
+                .setEmail(cancelledSubscriptionItemForMotVehicle.getEmail())
+                .setVrm(cancelledSubscriptionItemForMotVehicle.getVrm())
+                .setMotIdentification(motIdentification)
                 .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
 
-        repository.save(cancelledSubscription);
+        repository.save(cancelledSubscriptionForMotVehicle);
 
         QuerySpec spec = new QuerySpec()
                 .withKeyConditionExpression("id = :id AND email = :email")
-                .withValueMap(new ValueMap().withString(":id", cancelledSubscription.getUnsubscribeId()).withString(":email",
-                cancelledSubscription.getEmail()));
+                .withValueMap(new ValueMap().withString(":id", cancelledSubscriptionForMotVehicle.getUnsubscribeId()).withString(":email",
+                cancelledSubscriptionForMotVehicle.getEmail()));
 
         Item savedItem = new DynamoDB(client()).getTable(cancelledSubscriptionTableName()).query(spec).iterator().next();
 
         assertNotNull("cancelled_at cannot be null when saving db", savedItem.getString("cancelled_at"));
 
-        assertEquals("Returned item does not match", cancelledSubscription.getEmail(), savedItem.getString("email"));
+        assertEquals("Returned item does not match", cancelledSubscriptionForMotVehicle.getEmail(), savedItem.getString("email"));
+    }
+
+    @Test
+    public void saveCancelledSubscriptionForDvlaVehicle_CorrectlySavesNonModelAttributesToDb() {
+
+        CancelledSubscriptionItem cancelledSubscriptionItemForDvlaVehicle = new CancelledSubscriptionItem();
+        cancelledSubscriptionItemForDvlaVehicle.setMotTestNumber(null);
+
+        MotIdentification motIdentification = new MotIdentification(null, cancelledSubscriptionItemForDvlaVehicle.getDvlaId());
+
+        CancelledSubscription cancelledSubscriptionForDvlaVehicle = new CancelledSubscription();
+        cancelledSubscriptionForDvlaVehicle
+                .setUnsubscribeId(cancelledSubscriptionItemForDvlaVehicle.getUnsubscribeId())
+                .setEmail(cancelledSubscriptionItemForDvlaVehicle.getEmail())
+                .setVrm(cancelledSubscriptionItemForDvlaVehicle.getVrm())
+                .setMotIdentification(motIdentification)
+                .setReasonForCancellation(REASON_FOR_CANCELLATION_USER_CANCELLED);
+
+        repository.save(cancelledSubscriptionForDvlaVehicle);
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("id = :id AND email = :email")
+                .withValueMap(new ValueMap().withString(":id", cancelledSubscriptionForDvlaVehicle.getUnsubscribeId()).withString(":email",
+                cancelledSubscriptionForDvlaVehicle.getEmail()));
+
+        Item savedItem = new DynamoDB(client()).getTable(cancelledSubscriptionTableName()).query(spec).iterator().next();
+
+        assertNotNull("cancelled_at cannot be null when saving db", savedItem.getString("cancelled_at"));
+
+        assertEquals("Returned item does not match", cancelledSubscriptionForDvlaVehicle.getEmail(), savedItem.getString("email"));
     }
 }

@@ -14,6 +14,8 @@ public class CancelledSubscriptionItem {
 
     private String motTestNumber = RandomDataUtil.motTestNumber();
 
+    private String dvlaId = RandomDataUtil.motTestNumber();
+
     public String getUnsubscribeId() {
         return unsubscribeId;
     }
@@ -30,6 +32,18 @@ public class CancelledSubscriptionItem {
         return motTestNumber;
     }
 
+    public void setMotTestNumber(String motTestNumber) {
+        this.motTestNumber = motTestNumber;
+    }
+
+    public String getDvlaId() {
+        return dvlaId;
+    }
+
+    public void setDvlaId(String dvlaId) {
+        this.dvlaId = dvlaId;
+    }
+
     @Override
     public String toString() {
         return "CancelledSubscriptionItem{" +
@@ -37,6 +51,7 @@ public class CancelledSubscriptionItem {
                 ", vrm='" + vrm + '\'' +
                 ", email='" + email + '\'' +
                 ", motTestNumber='" + motTestNumber + '\'' +
+                ", dvlaId='" + dvlaId + '\'' +
                 '}';
     }
 }

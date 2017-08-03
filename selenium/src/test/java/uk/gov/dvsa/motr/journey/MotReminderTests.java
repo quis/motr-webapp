@@ -32,7 +32,7 @@ public class MotReminderTests extends BaseTest {
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
         //And I confirm my email address
-        motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
+        motReminder.subscribeToReminderAndConfirmEmail(vrm, email);
 
         //When I select to unsubscribe from an email reminder
         //And confirm that I would like to unsubscribe
@@ -52,7 +52,7 @@ public class MotReminderTests extends BaseTest {
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
         //And I confirm my email address
-        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
+        SubscriptionConfirmationPage confirmationPage = motReminder.subscribeToReminderAndConfirmEmail(vrm, email);
 
         //When I click sign up for another reminder
         //Then I am sent to the start page
@@ -66,7 +66,7 @@ public class MotReminderTests extends BaseTest {
             throws IOException, InterruptedException {
 
         // Given I am a user of the MOT reminders service with an active subscription
-        motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
+        motReminder.subscribeToReminderAndConfirmEmail(vrm, email);
 
         // When I create another MOT reminder subscription with the same VRM and email
         // Then I do not need to confirm my email address and am taken directly to the subscription confirmed page
@@ -102,7 +102,7 @@ public class MotReminderTests extends BaseTest {
 
         //Given I am a user of the MOT reminders service with an active subscription
         //When I unsubscribe from the email reminder via the unsubscribe link
-        motReminder.subscribeToReminderAndConfrimEmail(vrm, email);
+        motReminder.subscribeToReminderAndConfirmEmail(vrm, email);
         String subscriptionId = motReminder.subscriptionDb.findUnsubscribeIdByVrmAndEmail(vrm, email);
         motReminder.unsubscribeFromReminder(vrm, email);
 
@@ -177,6 +177,20 @@ public class MotReminderTests extends BaseTest {
         //Then I am taken to the privacy policy page
         assertEquals(privacyPage.getTitle(), "Privacy policy", "Privacy policy page is not returned");
     }
+
+
+    @Test(description = "Owner of a new vehicle with no mot is able to set up a MOT reminder with their VRM and email")
+    public void canCreatyeAReminderWhenVehicleDoesNotHaveAnMotYet() {
+
+        //Given I am an owner of a new vehicle
+        //When I enter the vehicle vrm and my email address
+        //And I confirm my email address
+        SubscriptionConfirmationPage subscriptionConfirmationPage = motReminder.subscribeToReminderAndConfirmEmail(RandomGenerator.generateDvlaVrm() , RandomGenerator.generateEmail());
+
+        //Then the confirmation page is displayed confirming my active reminder subscription
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You’ve signed up for an MOT reminder");
+    }
+
 
     @DataProvider(name = "dataProviderCreateMotReminderForMyVehicle")
     public Object[][] dataProviderCreateMotReminderForMyVehicle() throws IOException {

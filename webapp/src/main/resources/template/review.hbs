@@ -22,7 +22,7 @@
                     <td class="c-transaction-details__value">{{viewModel.colour}}</td>
                 </tr>
                 <tr class="c-transaction-details__item c-transaction-details__item--last">
-                    <th class="c-transaction-details__key">MOT expiry date</th>
+                    <th class="c-transaction-details__key">MOT {{#if isDvlaVehicle}}due {{else}}expiry{{/if}} date</th>
                     <td class="c-transaction-details__value">{{viewModel.expiryDate}}</td>
                 </tr>
             </tbody>
@@ -61,7 +61,7 @@
             </summary>
             <div class="panel-indent" id="details-content-0" aria-hidden="true">
                 <div class="text">
-                    <p>If you think the MOT expiry date or any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa" target="_blank">contact DVSA</a></p>
+                    <p>If you think the MOT {{due_or_expiry}} date or any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa" target="_blank">contact DVSA</a></p>
                 </div>
             </div>
         </details>

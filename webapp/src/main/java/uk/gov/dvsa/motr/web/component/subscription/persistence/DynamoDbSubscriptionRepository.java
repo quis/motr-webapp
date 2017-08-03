@@ -12,6 +12,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 
@@ -41,7 +42,6 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
             @SystemVariableParam(REGION) String region) {
 
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
-
         this.dynamoDb = new DynamoDB(client);
         this.tableName = tableName;
     }
@@ -68,21 +68,6 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public Optional<Subscription> findByVrmAndEmail(String vrm, String email) {
-        return findSubscriptionByVrmAndEmail(vrm, email);
-    }
-
-    private Subscription mapItemToSubscription(Item item) {
-
-        Subscription subscription = new Subscription();
-        subscription.setUnsubscribeId(item.getString("id"));
-        subscription.setVrm(item.getString("vrm"));
-        subscription.setEmail(item.getString("email"));
-        subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
-        subscription.setMotTestNumber(item.getString("mot_test_number"));
-        return subscription;
-    }
-
-    public Optional<Subscription> findSubscriptionByVrmAndEmail(String vrm, String email) {
 
         QuerySpec query = new QuerySpec()
                 .withKeyConditionExpression("vrm = :vrm AND email = :email")
@@ -102,6 +87,7 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         return Optional.of(mapItemToSubscription(item));
     }
 
+    @Override
     public void save(Subscription subscription) {
 
         Item item = new Item()
@@ -110,12 +96,18 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 .withString("email", subscription.getEmail())
                 .withString("mot_due_date", subscription.getMotDueDate().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .withString("mot_due_date_md", subscription.getMotDueDate().format(DateTimeFormatter.ofPattern("MM-dd")))
-                .withString("mot_test_number", subscription.getMotTestNumber())
                 .withString("created_at", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
+
+        if (subscription.getMotIdentification().getMotTestNumber().isPresent()) {
+            item.withString("mot_test_number", subscription.getMotIdentification().getMotTestNumber().get());
+        } else {
+            item.withString("dvla_id", subscription.getMotIdentification().getDvlaId().get());
+        }
 
         dynamoDb.getTable(tableName).putItem(item);
     }
 
+    @Override
     public void delete(Subscription subscription) {
         PrimaryKey key = new PrimaryKey("vrm", subscription.getVrm(), "email", subscription.getEmail());
         Map<String, Object> expressionAttributeValues = new HashMap<>();
@@ -127,5 +119,16 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
                 null,
                 expressionAttributeValues
         );
+    }
+
+    private Subscription mapItemToSubscription(Item item) {
+
+        Subscription subscription = new Subscription();
+        subscription.setUnsubscribeId(item.getString("id"));
+        subscription.setVrm(item.getString("vrm"));
+        subscription.setEmail(item.getString("email"));
+        subscription.setMotDueDate(LocalDate.parse(item.getString("mot_due_date")));
+        subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
+        return subscription;
     }
 }

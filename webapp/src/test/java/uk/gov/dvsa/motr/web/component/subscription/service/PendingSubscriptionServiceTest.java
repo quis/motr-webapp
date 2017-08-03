@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
@@ -44,6 +45,7 @@ public class PendingSubscriptionServiceTest {
     private static final String ALREADY_CONFIRMED_LINK = "ALREADY_CONFIRMED_LINK";
     private static final String CONFIRMATION_PENDING_LINK = "CONFIRMATION_PENDING_LINK";
     private static final String TEST_MOT_TEST_NUMBER = "123456";
+    private static final String TEST_DVLA_ID = "3456789";
 
     private PendingSubscriptionService subscriptionService;
 
@@ -61,7 +63,6 @@ public class PendingSubscriptionServiceTest {
         when(urlHelper.confirmEmailLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
         when(urlHelper.emailConfirmedNthTimeLink()).thenReturn(ALREADY_CONFIRMED_LINK);
         when(urlHelper.emailConfirmationPendingLink()).thenReturn(CONFIRMATION_PENDING_LINK);
-
     }
 
     @Test
@@ -76,7 +77,8 @@ public class PendingSubscriptionServiceTest {
         doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK, "TEST-MAKE TEST-MODEL, ");
         LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID, TEST_MOT_TEST_NUMBER);
+        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(
@@ -93,7 +95,8 @@ public class PendingSubscriptionServiceTest {
         doThrow(new RuntimeException()).when(pendingSubscriptionRepository).save(any(PendingSubscription.class));
         LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID, TEST_MOT_TEST_NUMBER);
+        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
         verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
         verifyZeroInteractions(notifyService);
     }
@@ -105,7 +108,8 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
         ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
 
-        String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date, TEST_MOT_TEST_NUMBER);
+        String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
         assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
@@ -120,7 +124,8 @@ public class PendingSubscriptionServiceTest {
         LocalDate date = LocalDate.now();
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
 
-        String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date, TEST_MOT_TEST_NUMBER);
+        String redirect = this.subscriptionService.handlePendingSubscriptionCreation(TEST_VRM, EMAIL, date,
+                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID));
 
         verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
         assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);

@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.core.DynamoDbFixture;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionItem;
 import uk.gov.dvsa.motr.test.integration.dynamodb.fixture.model.SubscriptionTable;
@@ -51,13 +52,14 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(actualSubscription.getEmail(), expectedSubscription.getEmail());
         assertEquals(actualSubscription.getVrm(), expectedSubscription.getVrm());
         assertEquals(actualSubscription.getMotDueDate(), expectedSubscription.getMotDueDate());
-        assertEquals(actualSubscription.getMotTestNumber(), expectedSubscription.getMotTestNumber());
+        assertEquals(actualSubscription.getMotIdentification().getMotTestNumber().get(), expectedSubscription.getMotTestNumber());
     }
 
     @Test
     public void saveSubscriptionCorrectlySavesToDb() {
 
         SubscriptionItem subscriptionItem = new SubscriptionItem();
+        MotIdentification motIdentification = new MotIdentification(subscriptionItem.getMotTestNumber(), null);
 
         Subscription subscription = new Subscription();
         subscription
@@ -65,7 +67,7 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate())
-                .setMotTestNumber(subscriptionItem.getMotTestNumber());
+                .setMotIdentification(motIdentification);
 
 
         repo.save(subscription);
@@ -79,7 +81,7 @@ public class DynamoDbSubscriptionRepositoryTest {
         assertEquals(subscriptionItem.getEmail(), actualSubscription.getEmail());
         assertEquals(subscriptionItem.getVrm(), actualSubscription.getVrm());
         assertEquals(subscriptionItem.getMotDueDate(), actualSubscription.getMotDueDate());
-        assertEquals(subscriptionItem.getMotTestNumber(), actualSubscription.getMotTestNumber());
+        assertEquals(subscriptionItem.getMotTestNumber(), actualSubscription.getMotIdentification().getMotTestNumber().get());
     }
 
 
@@ -87,6 +89,7 @@ public class DynamoDbSubscriptionRepositoryTest {
     public void saveSubscriptionCorrectlySavesNonModelAttributesToDb() {
 
         SubscriptionItem subscriptionItem = new SubscriptionItem();
+        MotIdentification motIdentification = new MotIdentification(subscriptionItem.getMotTestNumber(), null);
 
         Subscription subscription = new Subscription();
         subscription
@@ -94,7 +97,7 @@ public class DynamoDbSubscriptionRepositoryTest {
                 .setEmail(subscriptionItem.getEmail())
                 .setVrm(subscriptionItem.getVrm())
                 .setMotDueDate(subscriptionItem.getMotDueDate())
-                .setMotTestNumber(subscriptionItem.getMotTestNumber());
+                .setMotIdentification(motIdentification);
 
         repo.save(subscription);
 
@@ -111,19 +114,39 @@ public class DynamoDbSubscriptionRepositoryTest {
     }
 
     @Test
-    public void findByVrmAndEmailReturnsSubscriptionIfItExists() {
+    public void findByVrmAndEmail_ReturnsMotSubscriptionIfItExists_ForMotVehicle() {
 
-        SubscriptionItem expectedSubscription = new SubscriptionItem();
+        SubscriptionItem expectedSubscriptionForMotVehicle = new SubscriptionItem();
+        expectedSubscriptionForMotVehicle.setDvlaId(null);
 
-        fixture.table(new SubscriptionTable().item(expectedSubscription)).run();
+        fixture.table(new SubscriptionTable().item(expectedSubscriptionForMotVehicle)).run();
 
-        Subscription actualSubscription = repo.findByVrmAndEmail(expectedSubscription.getVrm(),
-                expectedSubscription.getEmail()).get();
+        Subscription actualSubscription = repo.findByVrmAndEmail(expectedSubscriptionForMotVehicle.getVrm(),
+                expectedSubscriptionForMotVehicle.getEmail()).get();
 
-        assertEquals(actualSubscription.getEmail(), expectedSubscription.getEmail());
-        assertEquals(actualSubscription.getVrm(), expectedSubscription.getVrm());
-        assertEquals(actualSubscription.getMotDueDate(), expectedSubscription.getMotDueDate());
-        assertEquals(actualSubscription.getMotTestNumber(), expectedSubscription.getMotTestNumber());
+        assertEquals(actualSubscription.getEmail(), expectedSubscriptionForMotVehicle.getEmail());
+        assertEquals(actualSubscription.getVrm(), expectedSubscriptionForMotVehicle.getVrm());
+        assertEquals(actualSubscription.getMotDueDate(), expectedSubscriptionForMotVehicle.getMotDueDate());
+        assertEquals(actualSubscription
+                .getMotIdentification().getMotTestNumber().get(), expectedSubscriptionForMotVehicle.getMotTestNumber());
+    }
+
+    @Test
+    public void findByVrmAndEmail_ReturnsMotSubscriptionIfItExists_ForDvlaVehicle() {
+
+        SubscriptionItem expectedSubscriptionForDvlaVehicle = new SubscriptionItem();
+
+        expectedSubscriptionForDvlaVehicle.setMotTestNumber(null);
+
+        fixture.table(new SubscriptionTable().item(expectedSubscriptionForDvlaVehicle)).run();
+
+        Subscription actualSubscription = repo.findByVrmAndEmail(expectedSubscriptionForDvlaVehicle.getVrm(),
+                expectedSubscriptionForDvlaVehicle.getEmail()).get();
+
+        assertEquals(actualSubscription.getEmail(), expectedSubscriptionForDvlaVehicle.getEmail());
+        assertEquals(actualSubscription.getVrm(), expectedSubscriptionForDvlaVehicle.getVrm());
+        assertEquals(actualSubscription.getMotDueDate(), expectedSubscriptionForDvlaVehicle.getMotDueDate());
+        assertEquals(actualSubscription.getMotIdentification().getDvlaId().get(), expectedSubscriptionForDvlaVehicle.getDvlaId());
     }
 
     @Test
@@ -144,12 +167,14 @@ public class DynamoDbSubscriptionRepositoryTest {
         SubscriptionItem sub = new SubscriptionItem();
         fixture.table(new SubscriptionTable().item(sub)).run();
 
+        MotIdentification motIdentification = new MotIdentification(sub.getMotTestNumber(), null);
+
         Subscription subscription = new Subscription();
         subscription
                 .setUnsubscribeId(sub.getUnsubscribeId())
                 .setEmail(sub.getEmail())
                 .setVrm(sub.getVrm())
-                .setMotTestNumber(sub.getMotTestNumber());
+                .setMotIdentification(motIdentification);
 
         repo.delete(subscription);
 
