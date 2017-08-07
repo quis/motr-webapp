@@ -35,4 +35,14 @@ public class DataLayerHelperTests {
         Map<String, String> map = dataLayerHelper.formatAttributes();
         assertTrue(map.isEmpty());
     }
+
+    @Test
+    public void dataLayerThatHasBeenClearedReturnsEmptyMap() {
+
+        dataLayerHelper.putAttribute("second-message", "test");
+        dataLayerHelper.clear();
+
+        Map<String, String> map = dataLayerHelper.formatAttributes();
+        assertTrue(map.isEmpty());
+    }
 }

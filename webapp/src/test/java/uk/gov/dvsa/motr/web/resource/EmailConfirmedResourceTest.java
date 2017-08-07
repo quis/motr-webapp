@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlreadyExistsException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
@@ -30,6 +31,8 @@ public class EmailConfirmedResourceTest {
     private static final String UNSUBSCRIBE_ID = "unsubscribe_id";
     private static final String EMAIL = "email";
     private static final String VRM = "vrm";
+    private static final String TEST_NUMBER = "12345";
+    private static final String DVLA_ID = "54321";
 
     public static final LocalDate DATE = LocalDate.now();
     private TemplateEngineStub engine = new TemplateEngineStub();
@@ -48,14 +51,13 @@ public class EmailConfirmedResourceTest {
                 urlHelper
         );
 
-        Subscription subscription = new Subscription().setUnsubscribeId(UNSUBSCRIBE_ID).setEmail(EMAIL).setVrm(VRM).setMotDueDate(DATE);
-        when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenReturn(subscription);
         when(urlHelper.emailConfirmedFirstTimeLink()).thenReturn("confirm-email/confirmed");
     }
 
     @Test
     public void subscriptionIsCreatedWhenUserConfirmsEmail() throws Exception {
 
+        mockSubscription(TEST_NUMBER, null);
         ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
 
         Response response = resource.confirmEmailGet(CONFIRMATION_ID);
@@ -70,6 +72,7 @@ public class EmailConfirmedResourceTest {
     @Test
     public void sessionIsClearedPendingSubscriptionConfirmed() throws Exception {
 
+        mockSubscription(TEST_NUMBER, null);
         resource.confirmEmailGet(CONFIRMATION_ID);
 
         verify(motrSession).clear();
@@ -77,6 +80,15 @@ public class EmailConfirmedResourceTest {
 
     @Test
     public void dataLayerIsBeingStoredOnFirstVisit() throws Exception {
+
+        motrSessionWillReturnValidPageParams();
+
+        resource.confirmEmailFirstTimeGet();
+        verifyDataLayer(getDataLayer());
+    }
+
+    @Test
+    public void dataLayerStoresDvlaIdWhenMotTestNumberNotPresent() {
 
         motrSessionWillReturnValidPageParams();
 
@@ -93,6 +105,18 @@ public class EmailConfirmedResourceTest {
         verifyDataLayer(getDataLayer());
     }
 
+    @Test
+    public void dataLayerIsPopulatedWithDvlaIdWhenMotTestNumberNotPresent() throws Exception {
+
+        EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
+        confirmationParams.setRegistration(VRM);
+        confirmationParams.setDvlaId(DVLA_ID);
+        when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+
+        resource.confirmEmailFirstTimeGet();
+
+        assertEquals("{\"vrm\":\"vrm\",\"dvla-id\":\"54321\"}", getDataLayer());
+    }
 
     @Test
     public void errorPageIsShownWhenSubscriptionDoesntExist() throws Exception {
@@ -124,6 +148,7 @@ public class EmailConfirmedResourceTest {
 
         EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
         confirmationParams.setRegistration(VRM);
+        confirmationParams.setMotTestNumber(TEST_NUMBER);
         when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
     }
 
@@ -134,6 +159,18 @@ public class EmailConfirmedResourceTest {
 
     private void verifyDataLayer(String dataLayer) {
 
-        assertEquals("{\"vrm\":\"vrm\"}", dataLayer);
+        assertEquals("{\"vrm\":\"vrm\",\"mot-test-number\":\"12345\"}", dataLayer);
+    }
+
+    private void mockSubscription(String motTestNumber, String dvlaId) throws InvalidConfirmationIdException {
+
+        MotIdentification motIdentification = new MotIdentification(motTestNumber, dvlaId);
+        Subscription subscription = new Subscription()
+                .setUnsubscribeId(UNSUBSCRIBE_ID)
+                .setEmail(EMAIL)
+                .setVrm(VRM)
+                .setMotDueDate(DATE)
+                .setMotIdentification(motIdentification);
+        when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenReturn(subscription);
     }
 }

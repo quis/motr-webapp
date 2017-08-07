@@ -1,5 +1,6 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
 import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmationIdException;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
@@ -20,6 +21,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.DLVA_ID_KEY;
+import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.MOT_TEST_NUMBER_KEY;
 import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 
 import static java.util.Collections.emptyMap;
@@ -58,7 +61,14 @@ public class EmailConfirmedResource {
         try {
             Subscription subscription = subscriptionConfirmationService.confirmSubscription(confirmationId);
             motrSession.clear();
-            addSubscriptionDetailsToSession(subscription);
+
+            MotIdentification motIdentification = subscription.getMotIdentification();
+            EmailConfirmationParams params = new EmailConfirmationParams();
+            params.setRegistration(subscription.getVrm());
+            params.setDvlaId(motIdentification.getDvlaId().orElse(""));
+            params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
+            motrSession.setEmailConfirmationParams(params);
+
             return RedirectResponseBuilder.redirect(urlHelper.emailConfirmedFirstTimeLink());
         } catch (InvalidConfirmationIdException e) {
             return Response.ok(renderer.render("subscription-error", emptyMap())).build();
@@ -79,18 +89,17 @@ public class EmailConfirmedResource {
         return showConfirmationPage();
     }
 
-    private void addSubscriptionDetailsToSession(Subscription subscription) {
-
-        EmailConfirmationParams params = new EmailConfirmationParams();
-        params.setRegistration(subscription.getVrm());
-        motrSession.setEmailConfirmationParams(params);
-    }
-
     private String showConfirmationPage() {
 
         EmailConfirmationParams subscription = motrSession.getEmailConfirmationParams();
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
+
+            if (subscription.getMotTestNumber() != null && !subscription.getMotTestNumber().isEmpty()) {
+                dataLayerHelper.putAttribute(MOT_TEST_NUMBER_KEY, subscription.getMotTestNumber());
+            } else {
+                dataLayerHelper.putAttribute(DLVA_ID_KEY, subscription.getDvlaId());
+            }
             return renderer.render("subscription-confirmation", buildMap());
         } else {
             return renderer.render("subscription-error", emptyMap());
@@ -101,6 +110,7 @@ public class EmailConfirmedResource {
 
         Map<String, Object> map = new HashMap<>();
         map.putAll(dataLayerHelper.formatAttributes());
+        dataLayerHelper.clear();
 
         return map;
     }

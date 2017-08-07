@@ -7,6 +7,8 @@ abstract class SubscriptionParams implements Serializable {
     private String email;
     private String expiryDate;
     private String registration;
+    private String dvlaId;
+    private String motTestNumber;
 
     public String getEmail() {
 
@@ -36,5 +38,25 @@ abstract class SubscriptionParams implements Serializable {
     public void setRegistration(String registration) {
 
         this.registration = registration;
+    }
+
+    public String getDvlaId() {
+
+        return dvlaId;
+    }
+
+    public void setDvlaId(String dvlaId) {
+
+        this.dvlaId = dvlaId;
+    }
+
+    public String getMotTestNumber() {
+
+        return motTestNumber;
+    }
+
+    public void setMotTestNumber(String motTestNumber) {
+
+        this.motTestNumber = motTestNumber;
     }
 }

@@ -82,6 +82,7 @@ public class EmailResource {
 
         map.put(EMAIL_MODEL_KEY, email);
         map.putAll(dataLayerHelper.formatAttributes());
+        dataLayerHelper.clear();
 
         return Response.status(200).entity(renderer.render(EMAIL_TEMPLATE_NAME, map)).build();
     }

@@ -11,6 +11,8 @@ public class DataLayerHelper {
     public static final String ERROR_KEY = "error";
     public static final String VRM_KEY = "vrm";
     public static final String UNSUBSCRIBE_FAILURE_KEY = "unsubscribe-failure";
+    public static final String DLVA_ID_KEY = "dvla-id";
+    public static final String MOT_TEST_NUMBER_KEY = "mot-test-number";
 
     private Map<String, String> attributes;
 
@@ -32,5 +34,10 @@ public class DataLayerHelper {
         Map<String, String> map = new HashMap<>();
         map.put("dataLayer", JSONObject.valueToString(attributes));
         return map;
+    }
+
+    public void clear() {
+
+        attributes.clear();
     }
 }

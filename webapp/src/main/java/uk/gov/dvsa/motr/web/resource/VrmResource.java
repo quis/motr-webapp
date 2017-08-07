@@ -124,6 +124,7 @@ public class VrmResource {
 
         modelMap.put(VRM_MODEL_KEY, vrm);
         modelMap.putAll(dataLayerHelper.formatAttributes());
+        dataLayerHelper.clear();
 
         return Response.ok(renderer.render(VRM_TEMPLATE_NAME, modelMap)).build();
     }
