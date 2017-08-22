@@ -78,8 +78,17 @@ public class ReviewViewModelTest {
 
         String expected = "test@test.com";
         ReviewViewModel viewModel = new ReviewViewModel();
-        viewModel.setEmail(expected);
-        assertTrue(expected.equals(viewModel.getEmail()));
+        viewModel.setContact(expected);
+        assertTrue(expected.equals(viewModel.getContact()));
+    }
+
+    @Test
+    public void whenPhoneNumberIsSetItCanBeRetrieved() {
+
+        String expected = "07806754189";
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setContact(expected);
+        assertEquals(expected, viewModel.getContact());
     }
 
     @Test
@@ -89,6 +98,24 @@ public class ReviewViewModelTest {
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setRegistration(expected);
         assertTrue(expected.equals(viewModel.getRegistration()));
+    }
+
+    @Test
+    public void whenContactTypeIsSetItToEmailCanBeRetrieved() {
+
+        String expected = "email";
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setContactType(expected);
+        assertEquals(expected, viewModel.getContactType());
+    }
+
+    @Test
+    public void whenContactTypeIsSetItToTextCanBeRetrieved() {
+
+        String expected = "text";
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setContactType(expected);
+        assertEquals(expected, viewModel.getContactType());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package uk.gov.dvsa.motr.helper;
 
 import uk.gov.dvsa.motr.navigation.PageNavigator;
+import uk.gov.dvsa.motr.ui.page.ChannelSelectionPage;
 import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
@@ -23,6 +24,14 @@ public class MotReminder {
         HomePage page = PageNavigator.goTo(HomePage.class);
         VrmPage vrmPage = page.clickStartNow();
         EmailPage emailPage = vrmPage.enterVrm(vrm);
+        return emailPage.enterEmailAddress(email);
+    }
+
+    public ReviewPage enterReminderDetailsSmsToggleOn(String vrm, String email) {
+        HomePage page = PageNavigator.goTo(HomePage.class);
+        VrmPage vrmPage = page.clickStartNow();
+        ChannelSelectionPage channelSelectionPage = vrmPage.enterVrmSmsToggleOn(vrm);
+        EmailPage emailPage = channelSelectionPage.selectEmailChannel();
         return emailPage.enterEmailAddress(email);
     }
 
@@ -54,9 +63,21 @@ public class MotReminder {
         return navigateToEmailConfirmationPage(vrm, email);
     }
 
+    public SubscriptionConfirmationPage subscribeToReminderAndConfirmEmailPostSms(String vrm, String email) {
+
+        enterAndConfirmPendingReminderDetails(vrm, email);
+
+        return navigateToEmailConfirmationPage(vrm, email);
+    }
+
     public EmailConfirmationPendingPage enterAndConfirmPendingReminderDetails(String vrm, String email) {
 
         return enterReminderDetails(vrm, email).confirmSubscriptionDetails();
+    }
+
+    public EmailConfirmationPendingPage enterAndConfirmPendingReminderDetailsPostSms(String vrm, String email) {
+
+        return enterReminderDetailsSmsToggleOn(vrm, email).confirmSubscriptionDetails();
     }
 
     public SubscriptionConfirmationPage enterAndConfirmPendingReminderDetailsSecondTime(String vrm, String email) {

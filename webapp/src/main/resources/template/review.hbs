@@ -6,7 +6,7 @@
 
             <h1 class="heading-large">Check your details</h1>
 
-            <p>Make sure the vehicle and your email address are correct.</p>
+            <p>Make sure the vehicle and your {{correctContactType}} are correct.</p>
 
             <h2 class="heading-medium">Vehicle details</h2>
 
@@ -53,7 +53,7 @@
             <details>
                 <summary role="button"><span class="summary">Incorrect vehicle details?</span></summary>
                 <div class="panel panel-border-narrow">
-                <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa" target="_blank">contact DVSA</a></p>
+                <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa/y/mot-vehicle-tests-and-approval " target="_blank">contact DVSA</a></p>
                 </div>
             </details>
 
@@ -62,14 +62,14 @@
 
      <div class="grid-row u-space-b30">
         <div class="column-two-thirds">
-        
+
             <h2 class="heading-medium">Your details</h2>
 
             <dl class="govuk-check-your-answers cya-questions-short cya-questions-short--switch-bold">
                 <div>
-                    <dt class="cya-question">Email address</dt>
-                    <dd class="cya-answer">{{viewModel.email}}</dd>
-                    <dd class="cya-change"><a id="change-email-link" href={{url this "/email"}}>Change<span class="visuallyhidden"> email address</span></a></dd>
+                    <dt class="cya-question">{{viewModel.contactType}}</dt>
+                    <dd class="cya-answer">{{viewModel.contact}}</dd>
+                    <dd class="cya-change"><a id="change-email-link" href={{url this changeContactUrl}}>Change<span class="visuallyhidden"> {{viewModel.contactType}}</span></a></dd>
                 </div>
             </dl>
 

@@ -15,7 +15,7 @@ public class HomepageResourceTest {
     public void homepageTemplateIsRenderedWhenRootPathAccessed() throws Exception {
 
         TemplateEngineStub engine = new TemplateEngineStub();
-        HomepageResource resource = new HomepageResource(new MotrSession(), engine);
+        HomepageResource resource = new HomepageResource(new MotrSession(true), engine);
 
         assertEquals(RESPONSE, resource.homePage());
         assertEquals("home", engine.getTemplate());

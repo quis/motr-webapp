@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
+import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
@@ -51,23 +52,43 @@ public class ReviewResource {
     @GET
     public Response reviewPage() throws Exception {
 
-        if (!this.motrSession.isAllowedOnPage()) {
+        if (!this.motrSession.isAllowedOnReviewPage()) {
             return redirect("/");
         }
 
         Map<String, Object> map = new HashMap<>();
         ReviewViewModel viewModel = new ReviewViewModel();
 
+        String contactFromSession;
+        String contactTypeFromSession;
+
         String regNumberFromSession = this.motrSession.getVrmFromSession();
-        String emailFromSession = this.motrSession.getEmailFromSession();
+        if (motrSession.isUsingEmailChannel()) {
+            contactFromSession = this.motrSession.getEmailFromSession();
+            contactTypeFromSession = "Email address";
+            map.put("changeContactUrl", "/email");
+            map.put("correctContactType", "email address");
+        } else if (motrSession.isUsingSmsChannel()) {
+            contactFromSession = this.motrSession.getPhoneNumberFromSession();
+            contactTypeFromSession = "Mobile number";
+            map.put("changeContactUrl", "/phone-number");
+            map.put("correctContactType", "mobile number");
+        } else {
+            contactFromSession = "";
+            contactTypeFromSession = "";
+            map.put("changeContactUrl", "/");
+            map.put("correctContactType", "");
+        }
 
         VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
 
         if (null != vehicle) {
             logger.info("review page resource vehicle.getMotIdentification().getDvlaId().isPresent() has value: " +
                     vehicle.getMotIdentification().getDvlaId().isPresent());
+
             viewModel.setColour(vehicle.getPrimaryColour(), vehicle.getSecondaryColour())
-                    .setEmail(emailFromSession)
+                    .setContact(contactFromSession)
+                    .setContactType(contactTypeFromSession)
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMake(vehicle.getMake())
                     .setModel(vehicle.getModel())
@@ -90,18 +111,34 @@ public class ReviewResource {
     public Response confirmationPagePost() throws Exception {
 
         String vrm = motrSession.getVrmFromSession();
-        String email = motrSession.getEmailFromSession();
+        String contactFromSession;
+        Subscription.ContactType contactType;
+
+        if (motrSession.isUsingEmailChannel()) {
+            contactFromSession = this.motrSession.getEmailFromSession();
+            contactType = Subscription.ContactType.EMAIL;
+        } else if (motrSession.isUsingSmsChannel()) {
+            contactFromSession = this.motrSession.getPhoneNumberFromSession();
+            contactType = Subscription.ContactType.MOBILE;
+        } else {
+            contactFromSession = "";
+            contactType = null;
+        }
+
         VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
 
-        if (detailsAreValid(vrm, email) && null != vehicle) {
+        if (detailsAreValid(vrm, contactFromSession) && null != vehicle) {
             LocalDate expiryDate = vehicle.getMotExpiryDate();
             String redirectUri =
-                    pendingSubscriptionService.handlePendingSubscriptionCreation(
-                    vrm, email, expiryDate, vehicle.getMotIdentification(), Subscription.ContactType.EMAIL);
+                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm,
+                    contactFromSession,
+                    expiryDate,
+                    vehicle.getMotIdentification(),
+                    contactType);
 
-            return redirectToSuccessScreen(redirectUri, email);
+            return redirectToSuccessScreen(redirectUri, contactFromSession);
         } else {
-            logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, email), vehicle);
+            logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactFromSession), vehicle);
             throw new NotFoundException();
         }
     }
@@ -115,11 +152,17 @@ public class ReviewResource {
         return redirect(redirectUri);
     }
 
-    private boolean detailsAreValid(String vrm, String email) {
+    private boolean detailsAreValid(String vrm, String contact) {
 
         VrmValidator vrmValidator = new VrmValidator();
-        EmailValidator emailValidator = new EmailValidator();
-
-        return vrmValidator.isValid(vrm) && emailValidator.isValid(email);
+        if (motrSession.isUsingEmailChannel()) {
+            EmailValidator validator = new EmailValidator();
+            return vrmValidator.isValid(vrm) && validator.isValid(contact);
+        } else if (motrSession.isUsingSmsChannel()) {
+            PhoneNumberValidator validator = new PhoneNumberValidator();
+            return vrmValidator.isValid(vrm) && validator.isValid(contact);
+        } else {
+            return false;
+        }
     }
 }

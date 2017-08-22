@@ -11,7 +11,8 @@ public class ReviewViewModel {
     private static String UNKNOWN_STRING = "Unknown";
 
     private String registration;
-    private String email;
+    private String contact;
+    private String contactType;
     private String make;
     private String model;
     private String colour;
@@ -29,14 +30,25 @@ public class ReviewViewModel {
         return this;
     }
 
-    public String getEmail() {
+    public ReviewViewModel setContactType(String contactType) {
 
-        return email;
+        this.contactType = contactType;
+        return this;
     }
 
-    public ReviewViewModel setEmail(String email) {
+    public String getContactType() {
 
-        this.email = email;
+        return contactType;
+    }
+
+    public String getContact() {
+
+        return contact;
+    }
+
+    public ReviewViewModel setContact(String contact) {
+
+        this.contact = contact;
         return this;
     }
 

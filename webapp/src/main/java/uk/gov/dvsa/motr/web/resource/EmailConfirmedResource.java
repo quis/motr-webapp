@@ -92,6 +92,12 @@ public class EmailConfirmedResource {
     private String showConfirmationPage() {
 
         EmailConfirmationParams subscription = motrSession.getEmailConfirmationParams();
+
+        Map<String, Object> modelMap = new HashMap<>();
+
+        modelMap.put("featureToggleSms", motrSession.isAllowedOnChannelSelectionPage());
+        modelMap.put("usingSms", motrSession.isUsingSmsChannel());
+
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
 
@@ -100,15 +106,14 @@ public class EmailConfirmedResource {
             } else {
                 dataLayerHelper.putAttribute(DLVA_ID_KEY, subscription.getDvlaId());
             }
-            return renderer.render("subscription-confirmation", buildMap());
+            return renderer.render("subscription-confirmation", buildMap(modelMap));
         } else {
             return renderer.render("subscription-error", emptyMap());
         }
     }
 
-    private Map<String, Object> buildMap() {
+    private Map<String, Object> buildMap(Map<String, Object> map) {
 
-        Map<String, Object> map = new HashMap<>();
         map.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
