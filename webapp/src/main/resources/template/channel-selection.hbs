@@ -1,0 +1,39 @@
+{{#partial "content" }}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+
+            <a href="{{{url this back_url}}}" class="link-back">{{back_button_text}}</a>
+
+            <h1 class="heading-xlarge">What type of reminder do you want to get?</h1>
+
+            {{#message}}
+                {{> partial/error-message }}
+            {{/message}}
+
+            {{#showSystemError}}
+                {{> partial/system-error }}
+            {{/showSystemError}}
+
+            <form method="POST" autocomplete="off" novalidate="">
+                <div class="form-group">
+                    <div class="multiple-choice">
+                        <input id="radio-1" type="radio" name="selectChannel" value="email" {{#if isEmailChecked}}checked="checked"{{/if}}>
+                        <label for="radio-1">Email</label>
+                    </div>
+                    <div class="multiple-choice">
+                        <input id="radio-2" type="radio" name="selectChannel" value="text"{{#if isTextChecked}}checked="checked"{{/if}}>
+                        <label for="radio-2">Text to my mobile phone</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="{{continue_button_text}}" id="continue" class="button">
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+{{/partial}}
+{{> master pageTitle="What type of reminder do you want to get? – MOT reminders"}}

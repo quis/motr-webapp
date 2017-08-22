@@ -33,6 +33,13 @@ public class VrmPage extends Page {
         return new EmailPage();
     }
 
+    public ChannelSelectionPage enterVrmSmsToggleOn(String vrm){
+
+        vrmField.sendKeys(vrm);
+        continueButton.click();
+        return new ChannelSelectionPage();
+    }
+
     public ReviewPage enterVrmExpectingReturnToReview(String vrm) {
 
         vrmField.clear();

@@ -10,9 +10,13 @@
             </div>
 
             <h2 class="heading-medium">What happens next?</h2>
-            <p>We've sent you a confirmation email.</p>
+            <p>We've sent you a confirmation {{#if featureToggleSms}}text message/{{/if}}email.</p>
             <p>You'll get an annual reminder a month before your MOT is due, and again 2 weeks later if you don't have your MOT yet.</p>
-            <p>If you want to unsubscribe at any time, click the link in the confirmation email or reminder email.</p>
+            {{#if usingSms}}
+                <p>If you want to unsubscribe at any time, text STOP <registration> to <reply number>.</p>
+            {{else}}
+                <p>If you want to unsubscribe at any time, click the link in the confirmation email or reminder email.</p>
+            {{/if}}
             <p>
                 <a href="http://www.smartsurvey.co.uk/s/YN642/" id="satisfaction-survey" target="_blank">What did you think of this service?</a> (takes 30 seconds)
             </p>

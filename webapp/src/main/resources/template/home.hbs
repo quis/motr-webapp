@@ -6,7 +6,7 @@
 
             <h1 class="heading-xlarge">Get an annual MOT reminder</h1>
 
-            <p class="lede">Sign up for free email reminders.</p>
+            <p class="lede">Sign up for free email {{#if featureToggleSms}}or text {{/if}}reminders</p>
 
             <p>You'll get a reminder a month before your MOT expiry date.</p>
 
@@ -25,7 +25,7 @@
 
             <ul class="list-bullet u-space-b15">
                 <li>your vehicle's registration number</li>
-                <li>an email address</li>
+                <li>an email address {{#if featureToggleSms}}or a mobile phone number{{/if}}</li>
             </ul>
 
             <p>You can unsubscribe from the reminders at any time from the confirmation or reminder email.</p>

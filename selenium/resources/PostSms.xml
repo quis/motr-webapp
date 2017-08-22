@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Post SMS Selenium tests" parallel="classes" thread-count="10">
+    <test name="Post SMS Selenium tests">
+        <groups>
+            <run>
+                <include name="PostSms"/>
+            </run>
+        </groups>
+        <packages>
+            <package name=".*"/>
+        </packages>
+    </test>
+</suite>

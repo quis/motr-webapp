@@ -52,7 +52,7 @@ public class UnsubscribeConfirmedResourceTest {
     @Test(expected = NotFoundException.class)
     public void unsubscribeConfirmedWillThrow404WhenSessionIsEmpty() throws Exception {
 
-        resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, new MotrSession(), client);
+        resource = new UnsubscribeConfirmedResource(TEMPLATE_ENGINE_STUB, new MotrSession(true), client);
         resource.unsubscribeConfirmed();
     }
 

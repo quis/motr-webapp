@@ -150,6 +150,8 @@ public class EmailConfirmedResourceTest {
         confirmationParams.setRegistration(VRM);
         confirmationParams.setMotTestNumber(TEST_NUMBER);
         when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+        when(motrSession.isAllowedOnChannelSelectionPage()).thenReturn(false);
+        when(motrSession.isUsingSmsChannel()).thenReturn(false);
     }
 
     private String getDataLayer() {

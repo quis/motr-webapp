@@ -142,6 +142,9 @@ public class VrmResource {
             return redirect("review");
         }
 
+        if (motrSession.isAllowedOnChannelSelectionPage()) {
+            return redirect("channel-selection");
+        }
         return redirect("email");
     }
 
