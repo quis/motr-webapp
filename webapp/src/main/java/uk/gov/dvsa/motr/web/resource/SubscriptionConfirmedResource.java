@@ -28,9 +28,9 @@ import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static java.util.Collections.emptyMap;
 
 @Singleton
-@Path("/confirm-email")
+@Path("/confirm-subscription")
 @Produces("text/html")
-public class EmailConfirmedResource {
+public class SubscriptionConfirmedResource {
 
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
@@ -38,9 +38,8 @@ public class EmailConfirmedResource {
     private MotrSession motrSession;
     private UrlHelper urlHelper;
 
-
     @Inject
-    public EmailConfirmedResource(
+    public SubscriptionConfirmedResource(
             TemplateEngine renderer,
             SubscriptionConfirmationService pendingSubscriptionActivatorService,
             MotrSession motrSession,
@@ -56,7 +55,7 @@ public class EmailConfirmedResource {
 
     @GET
     @Path("{confirmationId}")
-    public Response confirmEmailGet(@PathParam("confirmationId") String confirmationId) {
+    public Response confirmSubscriptionGet(@PathParam("confirmationId") String confirmationId) {
 
         try {
             Subscription subscription = subscriptionConfirmationService.confirmSubscription(confirmationId);
@@ -67,6 +66,7 @@ public class EmailConfirmedResource {
             params.setRegistration(subscription.getVrm());
             params.setDvlaId(motIdentification.getDvlaId().orElse(""));
             params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
+            params.setContactType(subscription.getContactType().getValue());
             motrSession.setEmailConfirmationParams(params);
 
             return RedirectResponseBuilder.redirect(urlHelper.emailConfirmedFirstTimeLink());
@@ -77,14 +77,14 @@ public class EmailConfirmedResource {
 
     @GET
     @Path("confirmed")
-    public String confirmEmailFirstTimeGet() {
+    public String confirmSubscriptionFirstTimeGet() {
 
         return showConfirmationPage();
     }
 
     @GET
     @Path("already-confirmed")
-    public String confirmEmailNthTimeGet() {
+    public String confirmSubscriptionNthTimeGet() {
 
         return showConfirmationPage();
     }
@@ -95,11 +95,14 @@ public class EmailConfirmedResource {
 
         Map<String, Object> modelMap = new HashMap<>();
 
-        modelMap.put("featureToggleSms", motrSession.isAllowedOnChannelSelectionPage());
-        modelMap.put("usingSms", motrSession.isUsingSmsChannel());
-
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
+
+            if (subscription.getContactType().equals(Subscription.ContactType.MOBILE.getValue())) {
+                modelMap.put("usingSms", true);
+                modelMap.put("replyNumber", "07491163040");
+                modelMap.put("registration", subscription.getRegistration());
+            }
 
             if (subscription.getMotTestNumber() != null && !subscription.getMotTestNumber().isEmpty()) {
                 dataLayerHelper.putAttribute(MOT_TEST_NUMBER_KEY, subscription.getMotTestNumber());

@@ -6,7 +6,9 @@ public class NotifyClientFailedEvent extends Event {
 
     public enum Type {
         EMAIL_CONFIRMATION,
-        SUBSCRIPTION_CONFIRMATION
+        SUBSCRIPTION_CONFIRMATION,
+        SMS_ONE_TIME_PASSCODE_CONFIRMATION,
+        SMS_SUBSCRIPTION_CONFIRMATION,
     }
 
     public NotifyClientFailedEvent setEmail(String email) {

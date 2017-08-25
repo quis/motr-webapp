@@ -8,6 +8,7 @@ import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.when;
 public class ReviewResourceTest {
 
     private static final PendingSubscriptionService PENDING_SUBSCRIPTION_SERVICE = mock(PendingSubscriptionService.class);
+    private static final SmsConfirmationService PENDING_SMS_SUBSCRIPTION_SERVICE = mock(SmsConfirmationService.class);
     private static final TemplateEngineStub TEMPLATE_ENGINE_STUB = new TemplateEngineStub();
     private static final MotrSession MOTR_SESSION = mock(MotrSession.class);
     private static final String VRM = "YN13NTX";
@@ -47,7 +49,8 @@ public class ReviewResourceTest {
         this.resource = new ReviewResource(
                 MOTR_SESSION,
                 TEMPLATE_ENGINE_STUB,
-                PENDING_SUBSCRIPTION_SERVICE
+                PENDING_SUBSCRIPTION_SERVICE,
+                PENDING_SMS_SUBSCRIPTION_SERVICE
         );
         when(MOTR_SESSION.getVrmFromSession()).thenReturn(VRM);
         when(MOTR_SESSION.getEmailFromSession()).thenReturn(EMAIL);

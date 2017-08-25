@@ -15,6 +15,7 @@ public class MotrSession {
 
     private static final String VRM_COOKIE_ID = "regNumber";
     private static final String EMAIL_COOKIE_ID = "email";
+    private static final String CONFIRMATION_ID_COOKIE_ID = "confirmationId";
     private static final String PHONE_NUMBER_COOKIE_ID = "phoneNumber";
     private static final String CHANNEL_COOKIE_ID = "channel";
     private static final String VEHICLE_DETAILS_ID = "vehicleDetails";
@@ -55,6 +56,12 @@ public class MotrSession {
 
         Object emailFromSession = getAttribute(EMAIL_COOKIE_ID);
         return emailFromSession == null ? "" : emailFromSession.toString();
+    }
+
+    public String getConfirmationIdFromSession() {
+
+        Object confirmationIdFromSession = getAttribute(CONFIRMATION_ID_COOKIE_ID);
+        return confirmationIdFromSession == null ? "" : confirmationIdFromSession.toString();
     }
 
     public String getPhoneNumberFromSession() {
@@ -126,6 +133,16 @@ public class MotrSession {
         return isAllowedOnEmailPage() && (!getEmailFromSession().isEmpty() || !getPhoneNumberFromSession().isEmpty());
     }
 
+    public boolean isAllowedOnSmsConfirmationCodePage() {
+
+        return isAllowedOnReviewPage() && (!getPhoneNumberFromSession().isEmpty());
+    }
+
+    public boolean isAllowedToResendSmsConfirmationCode() {
+
+        return isAllowedOnSmsConfirmationCodePage() && (!getConfirmationIdFromSession().isEmpty());
+    }
+
     public void setVisitingFromReview(boolean visitingFromReview) {
 
         this.setAttribute(VISITING_FROM_REVIEW_COOKIE_ID, visitingFromReview);
@@ -139,6 +156,11 @@ public class MotrSession {
     public void setEmail(String emailValue) {
 
         this.setAttribute(EMAIL_COOKIE_ID, emailValue);
+    }
+
+    public void setConfirmationId(String confirmationIdValue) {
+
+        this.setAttribute(CONFIRMATION_ID_COOKIE_ID, confirmationIdValue);
     }
 
     public void setPhoneNumber(String phoneNumberValue) {

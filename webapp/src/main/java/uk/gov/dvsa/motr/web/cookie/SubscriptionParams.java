@@ -9,6 +9,7 @@ abstract class SubscriptionParams implements Serializable {
     private String registration;
     private String dvlaId;
     private String motTestNumber;
+    private String contactType;
 
     public String getEmail() {
 
@@ -58,5 +59,15 @@ abstract class SubscriptionParams implements Serializable {
     public void setMotTestNumber(String motTestNumber) {
 
         this.motTestNumber = motTestNumber;
+    }
+
+    public String getContactType() {
+
+        return contactType;
+    }
+
+    public void setContactType(String contactType) {
+
+        this.contactType = contactType;
     }
 }

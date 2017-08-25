@@ -3,6 +3,7 @@ package uk.gov.dvsa.motr.web.resource;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
@@ -35,17 +36,20 @@ public class ReviewResource {
 
     private final TemplateEngine renderer;
     private PendingSubscriptionService pendingSubscriptionService;
+    private SmsConfirmationService smsConfirmationService;
     private final MotrSession motrSession;
 
     @Inject
     public ReviewResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            PendingSubscriptionService pendingSubscriptionService
+            PendingSubscriptionService pendingSubscriptionService,
+            SmsConfirmationService smsConfirmationService
     ) {
 
         this.renderer = renderer;
         this.pendingSubscriptionService = pendingSubscriptionService;
+        this.smsConfirmationService = smsConfirmationService;
         this.motrSession = motrSession;
     }
 
@@ -129,14 +133,34 @@ public class ReviewResource {
 
         if (detailsAreValid(vrm, contactFromSession) && null != vehicle) {
             LocalDate expiryDate = vehicle.getMotExpiryDate();
-            String redirectUri =
-                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm,
+
+            if (motrSession.isUsingEmailChannel()) {
+
+                String redirectUri = pendingSubscriptionService.handlePendingSubscriptionCreation(
+                        vrm,
+                        contactFromSession,
+                        expiryDate,
+                        vehicle.getMotIdentification(),
+                        contactType);
+
+                return redirectToSuccessScreen(redirectUri, contactFromSession);
+            }
+
+            String confirmationId = pendingSubscriptionService.handlePendingSubscriptionCreation(
+                    vrm,
                     contactFromSession,
                     expiryDate,
                     vehicle.getMotIdentification(),
                     contactType);
 
-            return redirectToSuccessScreen(redirectUri, contactFromSession);
+            motrSession.setConfirmationId(confirmationId);
+
+            String redirectUri = smsConfirmationService.handleSmsConfirmationCreation(
+                    vrm,
+                    contactFromSession,
+                    confirmationId);
+
+            return redirectToConfirmationCodeScreen(redirectUri, contactFromSession);
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactFromSession), vehicle);
             throw new NotFoundException();
@@ -147,6 +171,16 @@ public class ReviewResource {
 
         EmailConfirmationParams params = new EmailConfirmationParams();
         params.setEmail(email);
+        motrSession.setEmailConfirmationParams(params);
+
+        return redirect(redirectUri);
+    }
+
+    private Response redirectToConfirmationCodeScreen(String redirectUri, String phoneNumber) {
+
+        //TODO: Change to SMS confirmation params?
+        EmailConfirmationParams params = new EmailConfirmationParams();
+        params.setEmail(phoneNumber);
         motrSession.setEmailConfirmationParams(params);
 
         return redirect(redirectUri);

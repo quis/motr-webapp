@@ -18,7 +18,7 @@ public class UrlHelperTest {
     @Test
     public void testConfirmEmailUri() throws Exception {
 
-        assertEquals(baseUri + "confirm-email/AAAAb", urlHelper.confirmEmailLink("AAAAb"));
+        assertEquals(baseUri + "confirm-subscription/AAAAb", urlHelper.confirmSubscriptionLink("AAAAb"));
     }
 
     @Test
@@ -30,13 +30,13 @@ public class UrlHelperTest {
     @Test
     public void testEmailConfirmedFirstTimeLink() throws Exception {
 
-        assertEquals(baseUri + "confirm-email/confirmed", urlHelper.emailConfirmedFirstTimeLink());
+        assertEquals(baseUri + "confirm-subscription/confirmed", urlHelper.emailConfirmedFirstTimeLink());
     }
 
     @Test
     public void testEmailAlreadyConfirmedLink() throws Exception {
 
-        assertEquals(baseUri + "confirm-email/already-confirmed", urlHelper.emailConfirmedNthTimeLink());
+        assertEquals(baseUri + "confirm-subscription/already-confirmed", urlHelper.emailConfirmedNthTimeLink());
     }
 
     @Test

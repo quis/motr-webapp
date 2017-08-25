@@ -61,7 +61,7 @@ public class PendingSubscriptionServiceTest {
                 client
         );
 
-        when(urlHelper.confirmEmailLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
+        when(urlHelper.confirmSubscriptionLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
         when(urlHelper.emailConfirmedNthTimeLink()).thenReturn(ALREADY_CONFIRMED_LINK);
         when(urlHelper.emailConfirmationPendingLink()).thenReturn(CONFIRMATION_PENDING_LINK);
     }

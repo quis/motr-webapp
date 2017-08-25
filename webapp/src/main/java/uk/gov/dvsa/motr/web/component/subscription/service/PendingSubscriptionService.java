@@ -54,11 +54,18 @@ public class PendingSubscriptionService {
         if (subscription.isPresent()) {
             updateSubscriptionMotDueDate(subscription.get(), motDueDate);
 
-            return urlHelper.emailConfirmedNthTimeLink();
+            return urlHelper.emailConfirmedNthTimeLink(); //TODO: This will be different for mobile
         } else {
-            createPendingSubscription(vrm, email, motDueDate, generateId(), motIdentification, contactType);
+            String confimrationId = generateId();
+            createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
 
-            return urlHelper.emailConfirmationPendingLink();
+            //TODO: is there a better way to do this?
+            if (contactType == Subscription.ContactType.EMAIL) {
+
+                return urlHelper.emailConfirmationPendingLink();
+            }
+
+            return confimrationId;
         }
     }
 
@@ -85,12 +92,16 @@ public class PendingSubscriptionService {
 
         try {
             pendingSubscriptionRepository.save(pendingSubscription);
-            VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(vrm, client);
-            notifyService.sendEmailAddressConfirmationEmail(
-                    email,
-                    urlHelper.confirmEmailLink(pendingSubscription.getConfirmationId()),
-                    MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vrm
-            );
+
+            if (contactType == Subscription.ContactType.EMAIL) {
+
+                VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(vrm, client);
+                notifyService.sendEmailAddressConfirmationEmail(
+                        email,
+                        urlHelper.confirmSubscriptionLink(pendingSubscription.getConfirmationId()),
+                        MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vrm
+                );
+            }
             EventLogger.logEvent(
                     new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
                     .setMotIdentification(motIdentification)
