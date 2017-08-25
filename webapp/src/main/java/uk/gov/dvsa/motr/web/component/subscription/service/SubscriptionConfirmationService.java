@@ -58,7 +58,12 @@ public class SubscriptionConfirmationService {
 
         try {
             Subscription subscription = applyPendingSubscription(pendingSubscription);
-            sendSubscriptionConfirmationEmail(subscription);
+
+            if (subscription.getContactType() == Subscription.ContactType.EMAIL) {
+                sendSubscriptionConfirmationEmail(subscription);
+            } else {
+                sendSubscriptionConfirmationSms(subscription);
+            }
 
             EventLogger.logEvent(new SubscriptionConfirmedEvent()
                     .setVrm(subscription.getVrm())
@@ -103,5 +108,13 @@ public class SubscriptionConfirmationService {
                 subscription.getMotDueDate(),
                 urlHelper.unsubscribeLink(subscription.getUnsubscribeId()),
                 subscription.getMotIdentification());
+    }
+
+    private void sendSubscriptionConfirmationSms(Subscription subscription) {
+
+        notifyService.sendSubscriptionConfirmationSms(
+                subscription.getEmail(),
+                subscription.getVrm(),
+                subscription.getMotDueDate());
     }
 }

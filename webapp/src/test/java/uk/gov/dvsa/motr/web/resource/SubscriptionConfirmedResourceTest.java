@@ -10,8 +10,8 @@ import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlready
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
 import java.time.LocalDate;
@@ -25,18 +25,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class EmailConfirmedResourceTest {
+public class SubscriptionConfirmedResourceTest {
 
     private static final String CONFIRMATION_ID = "asdadasd";
     private static final String UNSUBSCRIBE_ID = "unsubscribe_id";
     private static final String EMAIL = "email";
     private static final String VRM = "vrm";
+    private static final String CONTACT_TYPE = "EMAIL";
     private static final String TEST_NUMBER = "12345";
     private static final String DVLA_ID = "54321";
 
     public static final LocalDate DATE = LocalDate.now();
     private TemplateEngineStub engine = new TemplateEngineStub();
-    private EmailConfirmedResource resource;
+    private SubscriptionConfirmedResource resource;
     private SubscriptionConfirmationService pendingSubscriptionActivatorService = mock(SubscriptionConfirmationService.class);
     private UrlHelper urlHelper = mock(UrlHelper.class);
     private MotrSession motrSession = mock(MotrSession.class);
@@ -44,28 +45,28 @@ public class EmailConfirmedResourceTest {
     @Before
     public void setup() throws SubscriptionAlreadyExistsException, InvalidConfirmationIdException {
 
-        resource = new EmailConfirmedResource(
+        resource = new SubscriptionConfirmedResource(
                 engine,
                 pendingSubscriptionActivatorService,
                 motrSession,
                 urlHelper
         );
 
-        when(urlHelper.emailConfirmedFirstTimeLink()).thenReturn("confirm-email/confirmed");
+        when(urlHelper.subscriptionConfirmedFirstTimeLink()).thenReturn("confirm-subscription/confirmed");
     }
 
     @Test
     public void subscriptionIsCreatedWhenUserConfirmsEmail() throws Exception {
 
         mockSubscription(TEST_NUMBER, null);
-        ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
+        ArgumentCaptor<SubscriptionConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(SubscriptionConfirmationParams.class);
 
-        Response response = resource.confirmEmailGet(CONFIRMATION_ID);
+        Response response = resource.confirmSubscriptionGet(CONFIRMATION_ID);
 
         verify(pendingSubscriptionActivatorService, times(1)).confirmSubscription(CONFIRMATION_ID);
-        verify(motrSession, times(1)).setEmailConfirmationParams(paramsArgumentCaptor.capture());
+        verify(motrSession, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
-        assertEquals("confirm-email/confirmed", response.getLocation().toString());
+        assertEquals("confirm-subscription/confirmed", response.getLocation().toString());
         assertEquals(VRM, paramsArgumentCaptor.getValue().getRegistration());
     }
 
@@ -73,7 +74,7 @@ public class EmailConfirmedResourceTest {
     public void sessionIsClearedPendingSubscriptionConfirmed() throws Exception {
 
         mockSubscription(TEST_NUMBER, null);
-        resource.confirmEmailGet(CONFIRMATION_ID);
+        resource.confirmSubscriptionGet(CONFIRMATION_ID);
 
         verify(motrSession).clear();
     }
@@ -83,7 +84,7 @@ public class EmailConfirmedResourceTest {
 
         motrSessionWillReturnValidPageParams();
 
-        resource.confirmEmailFirstTimeGet();
+        resource.confirmSubscriptionFirstTimeGet();
         verifyDataLayer(getDataLayer());
     }
 
@@ -92,7 +93,7 @@ public class EmailConfirmedResourceTest {
 
         motrSessionWillReturnValidPageParams();
 
-        resource.confirmEmailFirstTimeGet();
+        resource.confirmSubscriptionFirstTimeGet();
         verifyDataLayer(getDataLayer());
     }
 
@@ -101,19 +102,20 @@ public class EmailConfirmedResourceTest {
 
         motrSessionWillReturnValidPageParams();
 
-        resource.confirmEmailNthTimeGet();
+        resource.confirmSubscriptionNthTimeGet();
         verifyDataLayer(getDataLayer());
     }
 
     @Test
     public void dataLayerIsPopulatedWithDvlaIdWhenMotTestNumberNotPresent() throws Exception {
 
-        EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
+        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
         confirmationParams.setRegistration(VRM);
         confirmationParams.setDvlaId(DVLA_ID);
-        when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+        confirmationParams.setContactType(CONTACT_TYPE);
+        when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
 
-        resource.confirmEmailFirstTimeGet();
+        resource.confirmSubscriptionFirstTimeGet();
 
         assertEquals("{\"vrm\":\"vrm\",\"dvla-id\":\"54321\"}", getDataLayer());
     }
@@ -123,7 +125,7 @@ public class EmailConfirmedResourceTest {
 
         when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenThrow(InvalidConfirmationIdException.class);
 
-        resource.confirmEmailGet(CONFIRMATION_ID);
+        resource.confirmSubscriptionGet(CONFIRMATION_ID);
 
         assertEquals("subscription-error", engine.getTemplate());
     }
@@ -131,7 +133,7 @@ public class EmailConfirmedResourceTest {
     @Test
     public void errorPageIsShownWhenSubscriptionInNotPresentInTheSessionOnFirstVisit() throws Exception {
 
-        resource.confirmEmailFirstTimeGet();
+        resource.confirmSubscriptionFirstTimeGet();
 
         assertEquals("subscription-error", engine.getTemplate());
     }
@@ -139,17 +141,18 @@ public class EmailConfirmedResourceTest {
     @Test
     public void errorPageIsShownWhenSubscriptionInNotPresentInTheSessionOnNthVisit() throws Exception {
 
-        resource.confirmEmailNthTimeGet();
+        resource.confirmSubscriptionNthTimeGet();
 
         assertEquals("subscription-error", engine.getTemplate());
     }
 
     private void motrSessionWillReturnValidPageParams() {
 
-        EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
+        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
         confirmationParams.setRegistration(VRM);
         confirmationParams.setMotTestNumber(TEST_NUMBER);
-        when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+        confirmationParams.setContactType(CONTACT_TYPE);
+        when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
         when(motrSession.isAllowedOnChannelSelectionPage()).thenReturn(false);
         when(motrSession.isUsingSmsChannel()).thenReturn(false);
     }
@@ -172,6 +175,7 @@ public class EmailConfirmedResourceTest {
                 .setEmail(EMAIL)
                 .setVrm(VRM)
                 .setMotDueDate(DATE)
+                .setContactType(Subscription.ContactType.EMAIL)
                 .setMotIdentification(motIdentification);
         when(pendingSubscriptionActivatorService.confirmSubscription(CONFIRMATION_ID)).thenReturn(subscription);
     }

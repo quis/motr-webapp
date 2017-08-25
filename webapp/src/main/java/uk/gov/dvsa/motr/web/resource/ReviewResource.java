@@ -1,17 +1,20 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import com.amazonaws.util.StringUtils;
+
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
+import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 import uk.gov.dvsa.motr.web.validator.VrmValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,17 +38,20 @@ public class ReviewResource {
 
     private final TemplateEngine renderer;
     private PendingSubscriptionService pendingSubscriptionService;
+    private SmsConfirmationService smsConfirmationService;
     private final MotrSession motrSession;
 
     @Inject
     public ReviewResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            PendingSubscriptionService pendingSubscriptionService
+            PendingSubscriptionService pendingSubscriptionService,
+            SmsConfirmationService smsConfirmationService
     ) {
 
         this.renderer = renderer;
         this.pendingSubscriptionService = pendingSubscriptionService;
+        this.smsConfirmationService = smsConfirmationService;
         this.motrSession = motrSession;
     }
 
@@ -125,29 +131,43 @@ public class ReviewResource {
             contactType = null;
         }
 
-        VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();
+        VehicleDetails vehicle = motrSession.getVehicleDetailsFromSession();
 
         if (detailsAreValid(vrm, contactFromSession) && null != vehicle) {
-            LocalDate expiryDate = vehicle.getMotExpiryDate();
-            String redirectUri =
-                    pendingSubscriptionService.handlePendingSubscriptionCreation(vrm,
+
+            PendingSubscriptionServiceResponse pendingSubscriptionResponse = pendingSubscriptionService.handlePendingSubscriptionCreation(
+                    vrm,
                     contactFromSession,
-                    expiryDate,
+                    vehicle.getMotExpiryDate(),
                     vehicle.getMotIdentification(),
                     contactType);
 
-            return redirectToSuccessScreen(redirectUri, contactFromSession);
+            String redirectUri = pendingSubscriptionResponse.getRedirectUri();
+
+            if (!StringUtils.isNullOrEmpty(pendingSubscriptionResponse.getConfirmationId())) {
+
+                motrSession.setConfirmationId(pendingSubscriptionResponse.getConfirmationId());
+
+                redirectUri = smsConfirmationService.handleSmsConfirmationCreation(
+                        vrm,
+                        contactFromSession,
+                        pendingSubscriptionResponse.getConfirmationId());
+            }
+
+            return redirectToNextScreen(redirectUri, contactFromSession, contactType, vrm);
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactFromSession), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToSuccessScreen(String redirectUri, String email) {
+    private Response redirectToNextScreen(String redirectUri, String contact, Subscription.ContactType contactType, String vrm) {
 
-        EmailConfirmationParams params = new EmailConfirmationParams();
-        params.setEmail(email);
-        motrSession.setEmailConfirmationParams(params);
+        SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
+        params.setRegistration(vrm);
+        params.setContact(contact);
+        params.setContactType(contactType.getValue());
+        motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);
     }

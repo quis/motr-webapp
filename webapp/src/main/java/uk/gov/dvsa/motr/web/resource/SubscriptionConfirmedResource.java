@@ -6,8 +6,8 @@ import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmation
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import java.util.HashMap;
@@ -28,9 +28,9 @@ import static uk.gov.dvsa.motr.web.analytics.DataLayerHelper.VRM_KEY;
 import static java.util.Collections.emptyMap;
 
 @Singleton
-@Path("/confirm-email")
+@Path("/confirm-subscription")
 @Produces("text/html")
-public class EmailConfirmedResource {
+public class SubscriptionConfirmedResource {
 
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
@@ -38,9 +38,8 @@ public class EmailConfirmedResource {
     private MotrSession motrSession;
     private UrlHelper urlHelper;
 
-
     @Inject
-    public EmailConfirmedResource(
+    public SubscriptionConfirmedResource(
             TemplateEngine renderer,
             SubscriptionConfirmationService pendingSubscriptionActivatorService,
             MotrSession motrSession,
@@ -56,20 +55,21 @@ public class EmailConfirmedResource {
 
     @GET
     @Path("{confirmationId}")
-    public Response confirmEmailGet(@PathParam("confirmationId") String confirmationId) {
+    public Response confirmSubscriptionGet(@PathParam("confirmationId") String confirmationId) {
 
         try {
             Subscription subscription = subscriptionConfirmationService.confirmSubscription(confirmationId);
             motrSession.clear();
 
             MotIdentification motIdentification = subscription.getMotIdentification();
-            EmailConfirmationParams params = new EmailConfirmationParams();
+            SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
             params.setRegistration(subscription.getVrm());
             params.setDvlaId(motIdentification.getDvlaId().orElse(""));
             params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
-            motrSession.setEmailConfirmationParams(params);
+            params.setContactType(subscription.getContactType().getValue());
+            motrSession.setSubscriptionConfirmationParams(params);
 
-            return RedirectResponseBuilder.redirect(urlHelper.emailConfirmedFirstTimeLink());
+            return RedirectResponseBuilder.redirect(urlHelper.subscriptionConfirmedFirstTimeLink());
         } catch (InvalidConfirmationIdException e) {
             return Response.ok(renderer.render("subscription-error", emptyMap())).build();
         }
@@ -77,29 +77,32 @@ public class EmailConfirmedResource {
 
     @GET
     @Path("confirmed")
-    public String confirmEmailFirstTimeGet() {
+    public String confirmSubscriptionFirstTimeGet() {
 
         return showConfirmationPage();
     }
 
     @GET
     @Path("already-confirmed")
-    public String confirmEmailNthTimeGet() {
+    public String confirmSubscriptionNthTimeGet() {
 
         return showConfirmationPage();
     }
 
     private String showConfirmationPage() {
 
-        EmailConfirmationParams subscription = motrSession.getEmailConfirmationParams();
+        SubscriptionConfirmationParams subscription = motrSession.getSubscriptionConfirmationParams();
 
         Map<String, Object> modelMap = new HashMap<>();
 
-        modelMap.put("featureToggleSms", motrSession.isAllowedOnChannelSelectionPage());
-        modelMap.put("usingSms", motrSession.isUsingSmsChannel());
-
         if (null != subscription) {
             dataLayerHelper.putAttribute(VRM_KEY, subscription.getRegistration());
+
+            if (subscription.getContactType().equals(Subscription.ContactType.MOBILE.getValue())) {
+                modelMap.put("usingSms", true);
+                modelMap.put("replyNumber", "07491163040");
+                modelMap.put("registration", subscription.getRegistration());
+            }
 
             if (subscription.getMotTestNumber() != null && !subscription.getMotTestNumber().isEmpty()) {
                 dataLayerHelper.putAttribute(MOT_TEST_NUMBER_KEY, subscription.getMotTestNumber());

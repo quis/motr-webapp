@@ -6,12 +6,14 @@ public class NotifyClientFailedEvent extends Event {
 
     public enum Type {
         EMAIL_CONFIRMATION,
-        SUBSCRIPTION_CONFIRMATION
+        SUBSCRIPTION_CONFIRMATION,
+        PHONE_NUMBER_CONFIRMATION,
+        SMS_SUBSCRIPTION_CONFIRMATION,
     }
 
-    public NotifyClientFailedEvent setEmail(String email) {
+    public NotifyClientFailedEvent setContact(String contact) {
 
-        params.put("email", email);
+        params.put("contact", contact);
         return this;
     }
 

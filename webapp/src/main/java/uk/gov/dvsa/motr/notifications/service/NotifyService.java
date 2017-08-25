@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent.Type.EMAIL_CONFIRMATION;
+import static uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent.Type.PHONE_NUMBER_CONFIRMATION;
+import static uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent.Type.SMS_SUBSCRIPTION_CONFIRMATION;
 import static uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent.Type.SUBSCRIPTION_CONFIRMATION;
 
 public class NotifyService {
@@ -19,16 +21,22 @@ public class NotifyService {
     private NotificationClient notificationClient;
     private String subscriptionConfirmationTemplateId;
     private String emailConfirmationTemplateId;
+    private String smsSubscriptionConfirmationTemplateId;
+    private String smsConfirmationTemplateId;
 
     public NotifyService(
             NotificationClient notificationClient,
             String subscriptionConfirmationTemplateId,
-            String emailConfirmationTemplateId
+            String emailConfirmationTemplateId,
+            String smsSubscriptionConfirmationTemplateId,
+            String smsConfirmationTemplateId
     ) {
 
         this.notificationClient = notificationClient;
         this.subscriptionConfirmationTemplateId = subscriptionConfirmationTemplateId;
         this.emailConfirmationTemplateId = emailConfirmationTemplateId;
+        this.smsSubscriptionConfirmationTemplateId = smsSubscriptionConfirmationTemplateId;
+        this.smsConfirmationTemplateId = smsConfirmationTemplateId;
     }
 
     public void sendSubscriptionConfirmationEmail(
@@ -56,7 +64,7 @@ public class NotifyService {
 
         } catch (NotificationClientException e) {
 
-            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setEmail(emailAddress).setType(SUBSCRIPTION_CONFIRMATION), e);
+            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(emailAddress).setType(SUBSCRIPTION_CONFIRMATION), e);
             // wrapping because nothing can be done about it
             throw new RuntimeException(e);
         }
@@ -74,7 +82,42 @@ public class NotifyService {
 
         } catch (NotificationClientException e) {
 
-            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setEmail(emailAddress).setType(EMAIL_CONFIRMATION), e);
+            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(emailAddress).setType(EMAIL_CONFIRMATION), e);
+            // wrapping because nothing can be done about it
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendPhoneNumberConfirmationSms(String phoneNumber, String confirmationCode) {
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("confirmation_code", confirmationCode);
+
+        try {
+
+            notificationClient.sendSms(smsConfirmationTemplateId, phoneNumber, personalisation, "");
+
+        } catch (NotificationClientException e) {
+
+            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(phoneNumber).setType(PHONE_NUMBER_CONFIRMATION), e);
+            // wrapping because nothing can be done about it
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendSubscriptionConfirmationSms(String phoneNumber, String vehicleVrm, LocalDate motExpiryDate) {
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("vehicle_vrm", vehicleVrm);
+        personalisation.put("mot_expiry_date", DateFormatter.asDisplayDate(motExpiryDate));
+
+        try {
+
+            notificationClient.sendSms(smsSubscriptionConfirmationTemplateId, phoneNumber, personalisation, "");
+
+        } catch (NotificationClientException e) {
+
+            EventLogger.logErrorEvent(new NotifyClientFailedEvent().setContact(phoneNumber).setType(SMS_SUBSCRIPTION_CONFIRMATION), e);
             // wrapping because nothing can be done about it
             throw new RuntimeException(e);
         }

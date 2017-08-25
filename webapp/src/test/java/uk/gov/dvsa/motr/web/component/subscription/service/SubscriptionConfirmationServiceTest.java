@@ -38,6 +38,7 @@ public class SubscriptionConfirmationServiceTest {
     private static final LocalDate DATE = LocalDate.now();
     private static final String VRM = "vrm";
     private static final String EMAIL = "email";
+    private static final Subscription.ContactType CONTACT_TYPE = Subscription.ContactType.EMAIL;
     private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
     private static final String MOT_TEST_NUMBER = "12345";
 
@@ -97,7 +98,8 @@ public class SubscriptionConfirmationServiceTest {
                 .setConfirmationId(CONFIRMATION_ID)
                 .setMotDueDate(DATE)
                 .setEmail(EMAIL)
-                .setVrm(VRM);
+                .setVrm(VRM)
+                .setContactType(CONTACT_TYPE);
     }
 
     private MotIdentification motIdentificationStub() {
