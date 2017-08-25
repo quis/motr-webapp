@@ -15,13 +15,14 @@ public class MotrSession {
 
     private static final String VRM_COOKIE_ID = "regNumber";
     private static final String EMAIL_COOKIE_ID = "email";
+    private static final String CONFIRMATION_ID_COOKIE_ID = "confirmationId";
     private static final String PHONE_NUMBER_COOKIE_ID = "phoneNumber";
     private static final String CHANNEL_COOKIE_ID = "channel";
     private static final String VEHICLE_DETAILS_ID = "vehicleDetails";
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
     private static final String VISITING_FROM_CONTACT_ENTRY_COOKIE_ID = "visitingFromContactEntry";
     private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "unsubscribeConfirmationParams";
-    private static final String EMAIL_CONFIRMATION_PARAMS = "emailConfirmationParams";
+    private static final String SUBSCRIPTION_CONFIRMATION_PARAMS = "subscriptionConfirmationParams";
     private static final String EMAIL_CHANNEL = "email";
     private static final String TEXT_CHANNEL = "text";
 
@@ -57,6 +58,12 @@ public class MotrSession {
         return emailFromSession == null ? "" : emailFromSession.toString();
     }
 
+    public String getConfirmationIdFromSession() {
+
+        Object confirmationIdFromSession = getAttribute(CONFIRMATION_ID_COOKIE_ID);
+        return confirmationIdFromSession == null ? "" : confirmationIdFromSession.toString();
+    }
+
     public String getPhoneNumberFromSession() {
 
         Object phoneNumberFromSession = getAttribute(PHONE_NUMBER_COOKIE_ID);
@@ -84,9 +91,9 @@ public class MotrSession {
         return (VehicleDetails) getAttribute(VEHICLE_DETAILS_ID);
     }
 
-    public EmailConfirmationParams getEmailConfirmationParams() {
+    public SubscriptionConfirmationParams getSubscriptionConfirmationParams() {
 
-        return (EmailConfirmationParams) getAttribute(EMAIL_CONFIRMATION_PARAMS);
+        return (SubscriptionConfirmationParams) getAttribute(SUBSCRIPTION_CONFIRMATION_PARAMS);
     }
 
     public UnsubscribeConfirmationParams getUnsubscribeConfirmationParams() {
@@ -126,6 +133,21 @@ public class MotrSession {
         return isAllowedOnEmailPage() && (!getEmailFromSession().isEmpty() || !getPhoneNumberFromSession().isEmpty());
     }
 
+    public boolean isAllowedOnSmsConfirmationCodePage() {
+
+        return isAllowedOnReviewPage() && (!getPhoneNumberFromSession().isEmpty());
+    }
+
+    public boolean isAllowedToPostOnSmsConfirmationCodePage() {
+
+        return isAllowedOnSmsConfirmationCodePage() && (!getConfirmationIdFromSession().isEmpty());
+    }
+
+    public boolean isAllowedToResendSmsConfirmationCode() {
+
+        return isAllowedOnSmsConfirmationCodePage() && (!getConfirmationIdFromSession().isEmpty());
+    }
+
     public void setVisitingFromReview(boolean visitingFromReview) {
 
         this.setAttribute(VISITING_FROM_REVIEW_COOKIE_ID, visitingFromReview);
@@ -139,6 +161,11 @@ public class MotrSession {
     public void setEmail(String emailValue) {
 
         this.setAttribute(EMAIL_COOKIE_ID, emailValue);
+    }
+
+    public void setConfirmationId(String confirmationIdValue) {
+
+        this.setAttribute(CONFIRMATION_ID_COOKIE_ID, confirmationIdValue);
     }
 
     public void setPhoneNumber(String phoneNumberValue) {
@@ -161,9 +188,9 @@ public class MotrSession {
         this.setAttribute(CHANNEL_COOKIE_ID, channel);
     }
 
-    public void setEmailConfirmationParams(EmailConfirmationParams subscription) {
+    public void setSubscriptionConfirmationParams(SubscriptionConfirmationParams subscription) {
 
-        this.setAttribute(EMAIL_CONFIRMATION_PARAMS, subscription);
+        this.setAttribute(SUBSCRIPTION_CONFIRMATION_PARAMS, subscription);
     }
 
     public void setUnsubscribeConfirmationParams(UnsubscribeConfirmationParams unsubscribeConfirmationParams) {

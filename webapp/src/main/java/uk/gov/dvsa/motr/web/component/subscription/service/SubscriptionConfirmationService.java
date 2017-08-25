@@ -58,7 +58,12 @@ public class SubscriptionConfirmationService {
 
         try {
             Subscription subscription = applyPendingSubscription(pendingSubscription);
-            sendSubscriptionConfirmationEmail(subscription);
+
+            if (subscription.getContactType() == Subscription.ContactType.EMAIL) {
+                sendSubscriptionConfirmationEmail(subscription);
+            } else {
+                sendSubscriptionConfirmationSms(subscription);
+            }
 
             EventLogger.logEvent(new SubscriptionConfirmedEvent()
                     .setVrm(subscription.getVrm())
@@ -71,7 +76,7 @@ public class SubscriptionConfirmationService {
 
             EventLogger.logErrorEvent(new SubscriptionConfirmationFailedEvent()
                     .setVrm(pendingSubscription.getVrm())
-                    .setEmail(pendingSubscription.getEmail())
+                    .setEmail(pendingSubscription.getContact())
                     .setDueDate(pendingSubscription.getMotDueDate()));
             throw e;
         }
@@ -82,7 +87,7 @@ public class SubscriptionConfirmationService {
         Subscription subscription = new Subscription()
                 .setUnsubscribeId(generateId())
                 .setVrm(pendingSubscription.getVrm())
-                .setEmail(pendingSubscription.getEmail())
+                .setEmail(pendingSubscription.getContact())
                 .setMotDueDate(pendingSubscription.getMotDueDate())
                 .setMotIdentification(pendingSubscription.getMotIdentification())
                 .setContactType(pendingSubscription.getContactType());
@@ -103,5 +108,13 @@ public class SubscriptionConfirmationService {
                 subscription.getMotDueDate(),
                 urlHelper.unsubscribeLink(subscription.getUnsubscribeId()),
                 subscription.getMotIdentification());
+    }
+
+    private void sendSubscriptionConfirmationSms(Subscription subscription) {
+
+        notifyService.sendSubscriptionConfirmationSms(
+                subscription.getEmail(),
+                subscription.getVrm(),
+                subscription.getMotDueDate());
     }
 }

@@ -128,7 +128,7 @@ public class MotReminderTestsPreSms extends BaseTest {
         ReviewPage reviewPageSubmit = emailPageFromReview.enterEmailAddress(RandomGenerator.generateEmail());
 
         //Then my mot reminder is set up successfully with the updated email address
-        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
+        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetailsOnEmailChannel();
         assertEquals(confirmPage.getTitle(), "One more step");
     }
 
@@ -145,11 +145,11 @@ public class MotReminderTestsPreSms extends BaseTest {
         ReviewPage reviewPageSubmit = vrmPageFromReview.enterVrmExpectingReturnToReview(RandomGenerator.generateVrm());
 
         //Then my mot reminder is set up successfully with the updated vehicle vrm
-        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
+        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetailsOnEmailChannel();
         assertEquals(confirmPage.getTitle(), "One more step");
     }
 
-    @DataProvider(name = "dataProviderCreateMotReminderForMyVehicle")
+    @DataProvider(name = "dataProviderCreateEmailMotReminderForMyVehicle")
     public Object[][] dataProviderCreateMotReminderForMyVehicle() throws IOException {
 
         return new Object[][]{{RandomGenerator.generateVrm(), RandomGenerator.generateEmail()}};

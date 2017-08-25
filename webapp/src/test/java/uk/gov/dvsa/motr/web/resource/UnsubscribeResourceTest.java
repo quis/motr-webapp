@@ -47,7 +47,7 @@ public class UnsubscribeResourceTest {
 
         params.setExpiryDate(LocalDate.of(2015, 7, 10).toString());
         params.setRegistration("TEST-VRM");
-        params.setEmail("test@this-is-a-test-123");
+        params.setContact("test@this-is-a-test-123");
         when(motrSession.getUnsubscribeConfirmationParams()).thenReturn(params);
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMotTestNumber(MOT_TEST_NUMBER);

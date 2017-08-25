@@ -27,6 +27,8 @@ public class NotifyServiceTest {
     private String email = "test@test.com";
     private String templateId = "180";
     private String emailConfirmationTemplateId = "180";
+    private String smsSubscriptionConfirmationTemplateId = "180";
+    private String smsConfirmationTemplateId = "180";
     private String vehicleDetails = "TEST-MAKE TEST-MODEL, TEST-REG";
     private LocalDate motExpiryDate = LocalDate.of(2017, 1, 1);
     private String unsubscribeLink = "https://gov.uk";
@@ -35,7 +37,11 @@ public class NotifyServiceTest {
     @Before
     public void setUp() {
 
-        this.service = new NotifyService(CLIENT, templateId, emailConfirmationTemplateId);
+        this.service = new NotifyService(CLIENT,
+                templateId,
+                emailConfirmationTemplateId,
+                smsSubscriptionConfirmationTemplateId,
+                smsConfirmationTemplateId);
     }
 
     @Test

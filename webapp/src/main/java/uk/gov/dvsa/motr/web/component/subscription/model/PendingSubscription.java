@@ -10,7 +10,7 @@ public class PendingSubscription {
 
     private String vrm;
 
-    private String email;
+    private String contact;
 
     private LocalDate motDueDate;
 
@@ -40,12 +40,12 @@ public class PendingSubscription {
         return this;
     }
 
-    public String getEmail() {
-        return email;
+    public String getContact() {
+        return contact;
     }
 
-    public PendingSubscription setEmail(String email) {
-        this.email = email;
+    public PendingSubscription setContact(String contact) {
+        this.contact = contact;
         return this;
     }
 

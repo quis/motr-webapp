@@ -19,7 +19,7 @@ public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
 
     private String vrm = RandomDataUtil.vrm();
 
-    private String email = RandomDataUtil.email();
+    private String email = RandomDataUtil.emailOrPhoneNumber();
 
     private String motTestNumber = RandomDataUtil.motTestNumber();
 
@@ -37,7 +37,7 @@ public class PendingSubscriptionItem implements DynamoDbFixtureTableItem {
         return motTestNumber;
     }
 
-    private Subscription.ContactType contactType = Subscription.ContactType.EMAIL;
+    private Subscription.ContactType contactType = RandomDataUtil.emailOrMobileContactType();
 
     public PendingSubscriptionItem setMotTestNumber(String motTestNumber) {
         this.motTestNumber = motTestNumber;

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./gradlew clean build -Dtest.baseUrl=$1 -Dtest.dynamoDb.region=$2 -Dtest.dynamoDb.table.name=$3 -Dtest.dynamoDb.pendingTable.name=$4
+./gradlew clean build -Dtest.baseUrl=$1 -Dtest.dynamoDb.region=$2 -Dtest.dynamoDb.table.name=$3 -Dtest.dynamoDb.pendingTable.name=$4 -Dtest.dynamoDb.smsConfirmationTable.name=$5

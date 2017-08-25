@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MotrSessionTest {
 
+    private static final String CONFIRMATION_ID = "123ABC";
     private static final String VRM = "VRZ";
     private static final String EMAIL = "test@test.com";
     private static final String PHONE_NUMBER = "07801987627";
@@ -83,6 +84,60 @@ public class MotrSessionTest {
     }
 
     @Test
+    public void isAllowedOnSmsConfirmationCodePageReturnsFalseWhenNoSessionEntered() {
+
+        boolean actual = motrSession.isAllowedOnSmsConfirmationCodePage();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedOnSmsConfirmationCodePageReturnsTrueWhenVrmAndPhoneNumberExistsInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedOnSmsConfirmationCodePage();
+        assertTrue(actual);
+    }
+
+    @Test
+    public void isAllowedToPostOnSmsConfirmationCodePageReturnsFalseWhenConfirmationIdDoesNotExistInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedToPostOnSmsConfirmationCodePage();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedToPostOnSmsConfirmationCodePageReturnsTrueWhenVrmAndPhoneNumberAndConfirmationIdExistsInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        motrSession.setConfirmationId(CONFIRMATION_ID);
+        boolean actual = motrSession.isAllowedToPostOnSmsConfirmationCodePage();
+        assertTrue(actual);
+    }
+
+    @Test
+    public void isAllowedToResendSmsConfirmationCodeReturnsFalseWhenConfirmationIdDoesNotExistInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        boolean actual = motrSession.isAllowedToResendSmsConfirmationCode();
+        assertFalse(actual);
+    }
+
+    @Test
+    public void isAllowedToResendSmsConfirmationCodeReturnsTrueWhenConfirmationIdExistsInSession() {
+
+        motrSession.setVrm(VRM);
+        motrSession.setPhoneNumber(PHONE_NUMBER);
+        motrSession.setConfirmationId(CONFIRMATION_ID);
+        boolean actual = motrSession.isAllowedToResendSmsConfirmationCode();
+        assertTrue(actual);
+    }
+
+    @Test
     public void getRegFromSessionReturnsRegWhenInSession() {
 
         motrSession.setVrm(VRM);
@@ -103,6 +158,14 @@ public class MotrSessionTest {
         motrSession.setEmail(EMAIL);
         String actual = motrSession.getEmailFromSession();
         assertEquals("test@test.com", actual);
+    }
+
+    @Test
+    public void getConfirmationIdFromSessionReturnsConfirmationIdWhenInSession() {
+
+        motrSession.setConfirmationId(CONFIRMATION_ID);
+        String actual = motrSession.getConfirmationIdFromSession();
+        assertEquals(CONFIRMATION_ID, actual);
     }
 
     @Test

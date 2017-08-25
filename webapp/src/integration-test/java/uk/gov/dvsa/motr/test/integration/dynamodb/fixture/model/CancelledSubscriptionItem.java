@@ -10,7 +10,7 @@ public class CancelledSubscriptionItem {
 
     private String vrm = RandomDataUtil.vrm();
 
-    private String email = RandomDataUtil.email();
+    private String email = RandomDataUtil.emailOrPhoneNumber();
 
     private String motTestNumber = RandomDataUtil.motTestNumber();
 

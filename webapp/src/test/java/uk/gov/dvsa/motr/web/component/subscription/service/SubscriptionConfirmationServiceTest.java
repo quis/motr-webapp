@@ -33,13 +33,17 @@ public class SubscriptionConfirmationServiceTest {
     private final PendingSubscriptionRepository pendingSubscriptionRepository = mock(PendingSubscriptionRepository.class);
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
     private final NotifyService notifyService = mock(NotifyService.class);
+    private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
     private final UrlHelper urlHelper = mock(UrlHelper.class);
+
     private static final String CONFIRMATION_ID = "asdasdasd";
-    private static final LocalDate DATE = LocalDate.now();
     private static final String VRM = "vrm";
     private static final String EMAIL = "email";
-    private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
+    private static final String MOBILE = "07912345678";
     private static final String MOT_TEST_NUMBER = "12345";
+    private static final LocalDate DATE = LocalDate.now();
+    private static final Subscription.ContactType CONTACT_TYPE = Subscription.ContactType.EMAIL;
+    private static final Subscription.ContactType CONTACT_TYPE_MOBILE = Subscription.ContactType.MOBILE;
 
     private SubscriptionConfirmationService subscriptionService;
 
@@ -58,7 +62,7 @@ public class SubscriptionConfirmationServiceTest {
     @Test
     public void saveSubscriptionWhenSubscriptionDoesNotExistCallsDbToSaveDetails() throws Exception {
         when(client.fetch(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
-        PendingSubscription pendingSubscription = pendingSubscriptionStub();
+        PendingSubscription pendingSubscription = pendingSubscriptionEmailStub();
         withPendingSubscriptionFound(of(pendingSubscription));
 
         subscriptionService.confirmSubscription(CONFIRMATION_ID);
@@ -67,16 +71,38 @@ public class SubscriptionConfirmationServiceTest {
         verify(subscriptionRepository, times(1)).save(any(Subscription.class));
         verify(pendingSubscriptionRepository, times(1)).delete(pendingSubscription);
         verify(notifyService, times(1)).sendSubscriptionConfirmationEmail(
-                eq(pendingSubscription.getEmail()),
+                eq(pendingSubscription.getContact()),
                 eq(pendingSubscription.getVrm()),
                 eq(pendingSubscription.getMotDueDate()),
+                anyString(),
+                any(MotIdentification.class)
+        );
+        verify(notifyService, times(0)).sendSubscriptionConfirmationSms(any(), any(), any());
+    }
+
+    @Test
+    public void saveSubscriptionWhenSubscriptionDoesNotExistCallsDbToSaveDetailsWithMobile() throws Exception {
+        when(client.fetch(eq(VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        PendingSubscription pendingSubscription = pendingSubscriptionMobileStub();
+        withPendingSubscriptionFound(of(pendingSubscription));
+
+        subscriptionService.confirmSubscription(CONFIRMATION_ID);
+
+        verify(pendingSubscriptionRepository, times(1)).findByConfirmationId(CONFIRMATION_ID);
+        verify(subscriptionRepository, times(1)).save(any(Subscription.class));
+        verify(pendingSubscriptionRepository, times(1)).delete(pendingSubscription);
+        verify(notifyService, times(1)).sendSubscriptionConfirmationSms(MOBILE, VRM, DATE);
+        verify(notifyService, times(0)).sendSubscriptionConfirmationEmail(
+                anyString(),
+                anyString(),
+                any(),
                 anyString(),
                 any(MotIdentification.class)
         );
     }
 
     @Test(expected = InvalidConfirmationIdException.class)
-    public void throwsExceptionWhenPendingSubscriptionDoesNotExists() throws Exception {
+    public void throwsExceptionWhenPendingSubscriptionDoesNotExist() throws Exception {
 
         withPendingSubscriptionFound(empty());
 
@@ -91,13 +117,24 @@ public class SubscriptionConfirmationServiceTest {
         when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(finding);
     }
 
-    private PendingSubscription pendingSubscriptionStub() {
+    private PendingSubscription pendingSubscriptionEmailStub() {
 
         return new PendingSubscription()
                 .setConfirmationId(CONFIRMATION_ID)
                 .setMotDueDate(DATE)
-                .setEmail(EMAIL)
-                .setVrm(VRM);
+                .setContact(EMAIL)
+                .setVrm(VRM)
+                .setContactType(CONTACT_TYPE);
+    }
+
+    private PendingSubscription pendingSubscriptionMobileStub() {
+
+        return new PendingSubscription()
+                .setConfirmationId(CONFIRMATION_ID)
+                .setMotDueDate(DATE)
+                .setContact(MOBILE)
+                .setVrm(VRM)
+                .setContactType(CONTACT_TYPE_MOBILE);
     }
 
     private MotIdentification motIdentificationStub() {

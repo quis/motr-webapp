@@ -31,6 +31,11 @@ public class DynamoDbIntegrationHelper {
         return lookupProperty("test.dynamoDB.integration.table.cancelled_subscription");
     }
 
+    public static String smsConfirmationTableName() {
+
+        return lookupProperty("test.dynamoDB.integration.table.sms_confirmation");
+    }
+
     /**
      * Returns region for DynamoDB client
      *

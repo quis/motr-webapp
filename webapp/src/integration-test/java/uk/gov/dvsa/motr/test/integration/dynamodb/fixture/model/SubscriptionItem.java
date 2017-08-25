@@ -19,13 +19,13 @@ public class SubscriptionItem implements DynamoDbFixtureTableItem {
 
     private String vrm = RandomDataUtil.vrm();
 
-    private String email = RandomDataUtil.email();
+    private String email = RandomDataUtil.emailOrPhoneNumber();
 
     private String motTestNumber = RandomDataUtil.motTestNumber();
 
     private String dvlaId = RandomDataUtil.motTestNumber();
 
-    private Subscription.ContactType contactType = Subscription.ContactType.EMAIL;
+    private Subscription.ContactType contactType = RandomDataUtil.emailOrMobileContactType();
 
     public String getUnsubscribeId() {
         return unsubscribeId;
