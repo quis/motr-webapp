@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -87,8 +88,15 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         return Optional.of(mapItemToSubscription(item));
     }
 
+    /**
+     * Will also find by phone number. The column storing both phone numbers
+     * and email addresses is simply called "email".
+     *
+     * @param email the email address (or phone number) to find by.
+     * @return
+     */
     @Override
-    public Optional<Subscription> findByEmail(String email) {
+    public List<Optional<Subscription>> findByEmail(String email) {
         return null;
     }
 
