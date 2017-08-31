@@ -11,6 +11,8 @@ public interface SubscriptionRepository {
 
     Optional<Subscription> findByVrmAndEmail(String vrm, String email);
 
+    Optional<Subscription> findByEmail(String email);
+
     void save(Subscription subscription);
 
     void delete(Subscription subscription);

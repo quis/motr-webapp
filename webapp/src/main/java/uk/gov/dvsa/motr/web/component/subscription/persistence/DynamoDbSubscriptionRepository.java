@@ -88,6 +88,11 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
+    public Optional<Subscription> findByEmail(String email) {
+        return null;
+    }
+
+    @Override
     public void save(Subscription subscription) {
 
         Item item = new Item()
