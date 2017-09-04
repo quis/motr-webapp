@@ -7,6 +7,7 @@ import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.UnsubscribeService;
 import uk.gov.dvsa.motr.web.system.binder.factory.MotDueDateValidatorFactory;
 import uk.gov.dvsa.motr.web.system.binder.factory.NotifyServiceFactory;
@@ -24,5 +25,6 @@ public class ServiceBinder extends AbstractBinder {
         bind(SubscriptionConfirmationService.class).to(SubscriptionConfirmationService.class);
         bind(UnsubscribeService.class).to(UnsubscribeService.class);
         bind(UrlHelper.class).to(UrlHelper.class);
+        bind(SubscriptionService.class).to(SubscriptionService.class);
     }
 }

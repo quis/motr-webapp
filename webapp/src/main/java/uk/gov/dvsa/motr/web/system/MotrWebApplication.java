@@ -9,6 +9,7 @@ import uk.gov.dvsa.motr.web.system.binder.ServiceBinder;
 import uk.gov.dvsa.motr.web.system.binder.SessionBinder;
 import uk.gov.dvsa.motr.web.system.binder.SystemVariableBinder;
 import uk.gov.dvsa.motr.web.system.binder.TemplateEngineBinder;
+import uk.gov.dvsa.motr.web.system.binder.ValidatorBinder;
 
 public class MotrWebApplication extends ResourceConfig {
 
@@ -23,5 +24,6 @@ public class MotrWebApplication extends ResourceConfig {
         register(new RepositoryBinder());
         register(new SessionBinder());
         register(new LambdaWarmUpBinder());
+        register(new ValidatorBinder());
     }
 }
