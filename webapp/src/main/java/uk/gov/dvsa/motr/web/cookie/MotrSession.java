@@ -22,7 +22,7 @@ public class MotrSession {
     private static final String VISITING_FROM_REVIEW_COOKIE_ID = "visitingFromReview";
     private static final String VISITING_FROM_CONTACT_ENTRY_COOKIE_ID = "visitingFromContactEntry";
     private static final String UNSUBSCRIBE_CONFIRMATION_PARAMS = "unsubscribeConfirmationParams";
-    private static final String EMAIL_CONFIRMATION_PARAMS = "emailConfirmationParams";
+    private static final String SUBSCRIPTION_CONFIRMATION_PARAMS = "subscriptionConfirmationParams";
     private static final String EMAIL_CHANNEL = "email";
     private static final String TEXT_CHANNEL = "text";
 
@@ -91,9 +91,9 @@ public class MotrSession {
         return (VehicleDetails) getAttribute(VEHICLE_DETAILS_ID);
     }
 
-    public EmailConfirmationParams getEmailConfirmationParams() {
+    public SubscriptionConfirmationParams getSubscriptionConfirmationParams() {
 
-        return (EmailConfirmationParams) getAttribute(EMAIL_CONFIRMATION_PARAMS);
+        return (SubscriptionConfirmationParams) getAttribute(SUBSCRIPTION_CONFIRMATION_PARAMS);
     }
 
     public UnsubscribeConfirmationParams getUnsubscribeConfirmationParams() {
@@ -183,9 +183,9 @@ public class MotrSession {
         this.setAttribute(CHANNEL_COOKIE_ID, channel);
     }
 
-    public void setEmailConfirmationParams(EmailConfirmationParams subscription) {
+    public void setSubscriptionConfirmationParams(SubscriptionConfirmationParams subscription) {
 
-        this.setAttribute(EMAIL_CONFIRMATION_PARAMS, subscription);
+        this.setAttribute(SUBSCRIPTION_CONFIRMATION_PARAMS, subscription);
     }
 
     public void setUnsubscribeConfirmationParams(UnsubscribeConfirmationParams unsubscribeConfirmationParams) {

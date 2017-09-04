@@ -4,8 +4,8 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.EmailValidator;
 import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
@@ -169,9 +169,9 @@ public class ReviewResource {
 
     private Response redirectToSuccessScreen(String redirectUri, String email) {
 
-        EmailConfirmationParams params = new EmailConfirmationParams();
+        SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setEmail(email);
-        motrSession.setEmailConfirmationParams(params);
+        motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);
     }
@@ -179,9 +179,9 @@ public class ReviewResource {
     private Response redirectToConfirmationCodeScreen(String redirectUri, String phoneNumber) {
 
         //TODO: Change to SMS confirmation params?
-        EmailConfirmationParams params = new EmailConfirmationParams();
+        SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setEmail(phoneNumber);
-        motrSession.setEmailConfirmationParams(params);
+        motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);
     }

@@ -6,8 +6,8 @@ import uk.gov.dvsa.motr.web.component.subscription.exception.InvalidConfirmation
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 
 import java.util.HashMap;
@@ -62,12 +62,12 @@ public class SubscriptionConfirmedResource {
             motrSession.clear();
 
             MotIdentification motIdentification = subscription.getMotIdentification();
-            EmailConfirmationParams params = new EmailConfirmationParams();
+            SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
             params.setRegistration(subscription.getVrm());
             params.setDvlaId(motIdentification.getDvlaId().orElse(""));
             params.setMotTestNumber(motIdentification.getMotTestNumber().orElse(""));
             params.setContactType(subscription.getContactType().getValue());
-            motrSession.setEmailConfirmationParams(params);
+            motrSession.setSubscriptionConfirmationParams(params);
 
             return RedirectResponseBuilder.redirect(urlHelper.emailConfirmedFirstTimeLink());
         } catch (InvalidConfirmationIdException e) {
@@ -91,7 +91,7 @@ public class SubscriptionConfirmedResource {
 
     private String showConfirmationPage() {
 
-        EmailConfirmationParams subscription = motrSession.getEmailConfirmationParams();
+        SubscriptionConfirmationParams subscription = motrSession.getSubscriptionConfirmationParams();
 
         Map<String, Object> modelMap = new HashMap<>();
 

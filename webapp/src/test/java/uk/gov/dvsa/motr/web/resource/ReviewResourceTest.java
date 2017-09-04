@@ -9,8 +9,8 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
@@ -82,7 +82,7 @@ public class ReviewResourceTest {
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMotExpiryDate(now);
         MotIdentification expectedMotIdentification = new MotIdentification(TEST_MOT_TEST_NUMBER, null);
-        ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
+        ArgumentCaptor<SubscriptionConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(SubscriptionConfirmationParams.class);
 
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(MOTR_SESSION.isUsingEmailChannel()).thenReturn(true);
@@ -95,7 +95,7 @@ public class ReviewResourceTest {
 
         verify(PENDING_SUBSCRIPTION_SERVICE, times(1)).handlePendingSubscriptionCreation(eq(VRM), eq(EMAIL), eq(now),
                 any(MotIdentification.class), eq(CONTACT_TYPE));
-        verify(MOTR_SESSION, times(1)).setEmailConfirmationParams(paramsArgumentCaptor.capture());
+        verify(MOTR_SESSION, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals("email-confirmation-pending", response.getLocation().toString());
         assertEquals(EMAIL, paramsArgumentCaptor.getValue().getEmail());

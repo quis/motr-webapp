@@ -10,8 +10,8 @@ import uk.gov.dvsa.motr.web.component.subscription.exception.SubscriptionAlready
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
-import uk.gov.dvsa.motr.web.cookie.EmailConfirmationParams;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
+import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
 
 import java.time.LocalDate;
@@ -59,12 +59,12 @@ public class SubscriptionConfirmedResourceTest {
     public void subscriptionIsCreatedWhenUserConfirmsEmail() throws Exception {
 
         mockSubscription(TEST_NUMBER, null);
-        ArgumentCaptor<EmailConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(EmailConfirmationParams.class);
+        ArgumentCaptor<SubscriptionConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(SubscriptionConfirmationParams.class);
 
         Response response = resource.confirmSubscriptionGet(CONFIRMATION_ID);
 
         verify(pendingSubscriptionActivatorService, times(1)).confirmSubscription(CONFIRMATION_ID);
-        verify(motrSession, times(1)).setEmailConfirmationParams(paramsArgumentCaptor.capture());
+        verify(motrSession, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals("confirm-subscription/confirmed", response.getLocation().toString());
         assertEquals(VRM, paramsArgumentCaptor.getValue().getRegistration());
@@ -109,11 +109,11 @@ public class SubscriptionConfirmedResourceTest {
     @Test
     public void dataLayerIsPopulatedWithDvlaIdWhenMotTestNumberNotPresent() throws Exception {
 
-        EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
+        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
         confirmationParams.setRegistration(VRM);
         confirmationParams.setDvlaId(DVLA_ID);
         confirmationParams.setContactType(CONTACT_TYPE);
-        when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+        when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
 
         resource.confirmSubscriptionFirstTimeGet();
 
@@ -148,11 +148,11 @@ public class SubscriptionConfirmedResourceTest {
 
     private void motrSessionWillReturnValidPageParams() {
 
-        EmailConfirmationParams confirmationParams = new EmailConfirmationParams();
+        SubscriptionConfirmationParams confirmationParams = new SubscriptionConfirmationParams();
         confirmationParams.setRegistration(VRM);
         confirmationParams.setMotTestNumber(TEST_NUMBER);
         confirmationParams.setContactType(CONTACT_TYPE);
-        when(motrSession.getEmailConfirmationParams()).thenReturn(confirmationParams);
+        when(motrSession.getSubscriptionConfirmationParams()).thenReturn(confirmationParams);
         when(motrSession.isAllowedOnChannelSelectionPage()).thenReturn(false);
         when(motrSession.isUsingSmsChannel()).thenReturn(false);
     }
