@@ -47,23 +47,55 @@ public class PendingSubscriptionService {
     }
 
     public String handlePendingSubscriptionCreation(
-            String vrm, String email, LocalDate motDueDate, MotIdentification motIdentification, Subscription.ContactType contactType) {
+            String vrm, String email, LocalDate motDueDate,
+            MotIdentification motIdentification, Subscription.ContactType contactType) {
 
         Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
 
         if (subscription.isPresent()) {
             updateSubscriptionMotDueDate(subscription.get(), motDueDate);
 
-            return urlHelper.emailConfirmedNthTimeLink(); //TODO: This will be different for mobile
+            return contactType == Subscription.ContactType.EMAIL
+                    ? urlHelper.emailConfirmedNthTimeLink() : urlHelper.phoneConfirmedNthTimeLink();
         } else {
             String confimrationId = generateId();
             createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
 
-            //TODO: is there a better way to do this?
-            if (contactType == Subscription.ContactType.EMAIL) {
+            return contactType == Subscription.ContactType.EMAIL
+                    ? urlHelper.emailConfirmationPendingLink() : confimrationId;
+        }
+    }
 
-                return urlHelper.emailConfirmationPendingLink();
-            }
+    public String handlePendingSubscriptionCreationEmail(
+            String vrm, String email, LocalDate motDueDate,
+            MotIdentification motIdentification, Subscription.ContactType contactType) {
+
+        Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
+
+        if (subscription.isPresent()) {
+            updateSubscriptionMotDueDate(subscription.get(), motDueDate);
+
+            return urlHelper.emailConfirmedNthTimeLink();
+        } else {
+            createPendingSubscription(vrm, email, motDueDate, generateId(), motIdentification, contactType);
+
+            return urlHelper.emailConfirmationPendingLink();
+        }
+    }
+
+    public String handlePendingSubscriptionCreationSms(
+            String vrm, String email, LocalDate motDueDate,
+            MotIdentification motIdentification, Subscription.ContactType contactType) {
+
+        Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
+
+        if (subscription.isPresent()) {
+            updateSubscriptionMotDueDate(subscription.get(), motDueDate);
+
+            return urlHelper.phoneConfirmedNthTimeLink();
+        } else {
+            String confimrationId = generateId();
+            createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
 
             return confimrationId;
         }

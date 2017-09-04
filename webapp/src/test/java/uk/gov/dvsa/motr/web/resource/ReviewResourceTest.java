@@ -98,7 +98,7 @@ public class ReviewResourceTest {
         verify(MOTR_SESSION, times(1)).setSubscriptionConfirmationParams(paramsArgumentCaptor.capture());
         assertEquals(302, response.getStatus());
         assertEquals("email-confirmation-pending", response.getLocation().toString());
-        assertEquals(EMAIL, paramsArgumentCaptor.getValue().getEmail());
+        assertEquals(EMAIL, paramsArgumentCaptor.getValue().getContact());
     }
 
     @Test(expected = NotFoundException.class)

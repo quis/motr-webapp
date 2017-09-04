@@ -59,7 +59,7 @@ public class UnsubscribeConfirmedResource {
         UnsubscribeViewModel viewModel = new UnsubscribeViewModel()
                 .setRegistration(params.getRegistration())
                 .setExpiryDate(LocalDate.parse(params.getExpiryDate()))
-                .setEmail(params.getEmail())
+                .setEmail(params.getContact())
                 .setMakeModel(MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", "));
 
         DataLayerHelper helper = new DataLayerHelper();

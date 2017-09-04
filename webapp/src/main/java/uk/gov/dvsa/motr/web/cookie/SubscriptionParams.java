@@ -4,21 +4,21 @@ import java.io.Serializable;
 
 abstract class SubscriptionParams implements Serializable {
 
-    private String email;
+    private String contact;
     private String expiryDate;
     private String registration;
     private String dvlaId;
     private String motTestNumber;
     private String contactType;
 
-    public String getEmail() {
+    public String getContact() {
 
-        return email;
+        return contact;
     }
 
-    public void setEmail(String email) {
+    public void setContact(String contact) {
 
-        this.email = email;
+        this.contact = contact;
     }
 
     public String getExpiryDate() {

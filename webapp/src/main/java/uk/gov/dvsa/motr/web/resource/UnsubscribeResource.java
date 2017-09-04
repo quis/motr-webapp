@@ -77,7 +77,7 @@ public class UnsubscribeResource {
         Subscription removedSubscription = unsubscribeService.unsubscribe(unsubscribeId);
 
         UnsubscribeConfirmationParams params = new UnsubscribeConfirmationParams();
-        params.setEmail(removedSubscription.getEmail());
+        params.setContact(removedSubscription.getEmail());
         params.setExpiryDate(removedSubscription.getMotDueDate().toString());
         params.setRegistration(removedSubscription.getVrm());
 

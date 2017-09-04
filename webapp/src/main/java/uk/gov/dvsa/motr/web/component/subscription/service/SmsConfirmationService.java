@@ -37,7 +37,6 @@ public class SmsConfirmationService {
 
     public String handleSmsConfirmationCreation(String vrm, String phoneNumber, String confirmationId) {
 
-        //TODO: USE CONFIRMATION CODE GENERATOR
         createSmsConfirmation(vrm, phoneNumber, generateCode(), confirmationId);
 
         return urlHelper.phoneConfirmationLink();
@@ -78,6 +77,7 @@ public class SmsConfirmationService {
         return urlHelper.phoneConfirmationLink();
     }
 
+    //TODO: Add params
     /**
      * Creates pending SMS subscription in the system to be verified by the user right away
      * @param phoneNumber           subscription phone number

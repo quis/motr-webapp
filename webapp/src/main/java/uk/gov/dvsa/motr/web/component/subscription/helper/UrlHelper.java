@@ -40,7 +40,7 @@ public class UrlHelper {
 
     public String phoneConfirmedNthTimeLink() {
 
-        return UriBuilder.fromPath(this.baseUrl).path("confirm-subscription/already-confirmed").build().toString();
+        return UriBuilder.fromPath(this.baseUrl).path("confirm-subscription/confirmed").build().toString();
     }
 
     public String phoneConfirmationLink() {
