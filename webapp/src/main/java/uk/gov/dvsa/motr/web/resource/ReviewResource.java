@@ -178,7 +178,6 @@ public class ReviewResource {
 
     private Response redirectToConfirmationCodeScreen(String redirectUri, String phoneNumber) {
 
-        //TODO: Change to SMS confirmation params?
         SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setEmail(phoneNumber);
         motrSession.setSubscriptionConfirmationParams(params);

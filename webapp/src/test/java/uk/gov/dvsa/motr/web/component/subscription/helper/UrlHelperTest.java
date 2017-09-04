@@ -30,7 +30,7 @@ public class UrlHelperTest {
     @Test
     public void testEmailConfirmedFirstTimeLink() throws Exception {
 
-        assertEquals(baseUri + "confirm-subscription/confirmed", urlHelper.emailConfirmedFirstTimeLink());
+        assertEquals(baseUri + "confirm-subscription/confirmed", urlHelper.subscriptionConfirmedFirstTimeLink());
     }
 
     @Test

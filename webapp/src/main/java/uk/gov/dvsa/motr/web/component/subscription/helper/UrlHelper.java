@@ -28,7 +28,7 @@ public class UrlHelper {
                 .path(confirmationId).build().toString();
     }
 
-    public String emailConfirmedFirstTimeLink() {
+    public String subscriptionConfirmedFirstTimeLink() {
 
         return UriBuilder.fromPath(this.baseUrl).path("confirm-subscription/confirmed").build().toString();
     }
@@ -38,15 +38,14 @@ public class UrlHelper {
         return UriBuilder.fromPath(this.baseUrl).path("confirm-subscription/already-confirmed").build().toString();
     }
 
+    public String phoneConfirmedNthTimeLink() {
+
+        return UriBuilder.fromPath(this.baseUrl).path("confirm-subscription/already-confirmed").build().toString();
+    }
+
     public String phoneConfirmationLink() {
 
         return UriBuilder.fromPath(this.baseUrl).path("confirm-phone").build().toString();
-    }
-
-    //TODO: what about phone already confimed?
-    public String phoneConfirmedFirstTimeLink() {
-
-        return UriBuilder.fromPath(this.baseUrl).path("confirm-phone/confirmed").build().toString();
     }
 
     public String unsubscribeLink(String unsubscribeId) {

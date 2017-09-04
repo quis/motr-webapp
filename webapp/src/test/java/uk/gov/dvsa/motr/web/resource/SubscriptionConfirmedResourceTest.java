@@ -52,7 +52,7 @@ public class SubscriptionConfirmedResourceTest {
                 urlHelper
         );
 
-        when(urlHelper.emailConfirmedFirstTimeLink()).thenReturn("confirm-subscription/confirmed");
+        when(urlHelper.subscriptionConfirmedFirstTimeLink()).thenReturn("confirm-subscription/confirmed");
     }
 
     @Test

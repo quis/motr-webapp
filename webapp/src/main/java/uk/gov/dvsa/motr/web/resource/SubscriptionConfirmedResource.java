@@ -69,7 +69,7 @@ public class SubscriptionConfirmedResource {
             params.setContactType(subscription.getContactType().getValue());
             motrSession.setSubscriptionConfirmationParams(params);
 
-            return RedirectResponseBuilder.redirect(urlHelper.emailConfirmedFirstTimeLink());
+            return RedirectResponseBuilder.redirect(urlHelper.subscriptionConfirmedFirstTimeLink());
         } catch (InvalidConfirmationIdException e) {
             return Response.ok(renderer.render("subscription-error", emptyMap())).build();
         }
