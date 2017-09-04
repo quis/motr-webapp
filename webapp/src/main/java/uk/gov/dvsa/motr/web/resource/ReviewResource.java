@@ -40,12 +40,14 @@ public class ReviewResource {
     private PendingSubscriptionService pendingSubscriptionService;
     private SmsConfirmationService smsConfirmationService;
     private final MotrSession motrSession;
+    private final PhoneNumberValidator phoneNumberValidator;
 
     @Inject
     public ReviewResource(
             MotrSession motrSession,
             TemplateEngine renderer,
             PendingSubscriptionService pendingSubscriptionService,
+            PhoneNumberValidator phoneNumberValidator,
             SmsConfirmationService smsConfirmationService
     ) {
 
@@ -53,6 +55,7 @@ public class ReviewResource {
         this.pendingSubscriptionService = pendingSubscriptionService;
         this.smsConfirmationService = smsConfirmationService;
         this.motrSession = motrSession;
+        this.phoneNumberValidator = phoneNumberValidator;
     }
 
     @GET
@@ -179,8 +182,7 @@ public class ReviewResource {
             EmailValidator validator = new EmailValidator();
             return vrmValidator.isValid(vrm) && validator.isValid(contact);
         } else if (motrSession.isUsingSmsChannel()) {
-            PhoneNumberValidator validator = new PhoneNumberValidator();
-            return vrmValidator.isValid(vrm) && validator.isValid(contact);
+            return vrmValidator.isValid(vrm) && phoneNumberValidator.isValid(contact);
         } else {
             return false;
         }

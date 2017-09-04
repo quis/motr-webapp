@@ -31,17 +31,20 @@ public class PhoneNumberResource {
 
     private final TemplateEngine renderer;
     private final MotrSession motrSession;
+    private PhoneNumberValidator validator;
 
     private DataLayerHelper dataLayerHelper;
 
     @Inject
     public PhoneNumberResource(
             MotrSession motrSession,
-            TemplateEngine renderer
+            TemplateEngine renderer,
+            PhoneNumberValidator validator
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
+        this.validator = validator;
     }
 
     @GET
@@ -69,8 +72,6 @@ public class PhoneNumberResource {
 
     @POST
     public Response phoneNumberPagePost(@FormParam("phoneNumber") String phoneNumber) throws Exception {
-
-        PhoneNumberValidator validator = new PhoneNumberValidator();
 
         if (validator.isValid(phoneNumber)) {
             motrSession.setChannel("text");

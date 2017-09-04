@@ -3,8 +3,10 @@ package uk.gov.dvsa.motr.web.resource;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
+import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 
 import javax.ws.rs.core.Response;
 
@@ -19,13 +21,15 @@ public class PhoneNumberResourceTest {
     private MotrSession motrSession;
     private TemplateEngineStub engine;
     private PhoneNumberResource resource;
+    private PhoneNumberValidator validator;
 
     @Before
     public void setup() {
 
+        validator = mock(PhoneNumberValidator.class);
         motrSession = mock(MotrSession.class);
         engine = new TemplateEngineStub();
-        resource = new PhoneNumberResource(motrSession, engine);
+        resource = new PhoneNumberResource(motrSession, engine, validator);
         when(motrSession.getPhoneNumberFromSession()).thenReturn(PHONE_NUMBER);
     }
 
@@ -41,6 +45,7 @@ public class PhoneNumberResourceTest {
     @Test
     public void onPostWithValid_ThenRedirectedToReviewPage() throws Exception {
 
+        when(validator.isValid(PHONE_NUMBER)).thenReturn(true);
         Response response = resource.phoneNumberPagePost(PHONE_NUMBER);
 
         assertEquals(302, response.getStatus());

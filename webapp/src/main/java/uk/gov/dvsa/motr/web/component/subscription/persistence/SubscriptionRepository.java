@@ -12,7 +12,14 @@ public interface SubscriptionRepository {
 
     Optional<Subscription> findByVrmAndEmail(String vrm, String email);
 
-    List<Optional<Subscription>> findByEmail(String email);
+    /**
+     * Will also find by phone number. The column storing both phone numbers
+     * and email addresses is simply called "email".
+     *
+     * @param email the email address (or phone number) to find by.
+     * @return A list of subscriptions matching the email parameter.
+     */
+    List<Subscription> findByEmail(String email);
 
     void save(Subscription subscription);
 

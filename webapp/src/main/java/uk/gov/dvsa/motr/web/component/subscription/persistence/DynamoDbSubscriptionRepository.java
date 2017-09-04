@@ -19,6 +19,7 @@ import uk.gov.dvsa.motr.web.helper.SystemVariableParam;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -89,15 +90,19 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
     }
 
     /**
-     * Will also find by phone number. The column storing both phone numbers
-     * and email addresses is simply called "email".
-     *
-     * @param email the email address (or phone number) to find by.
-     * @return
+     * {@inheritDoc}
      */
     @Override
-    public List<Optional<Subscription>> findByEmail(String email) {
-        return null;
+    public List<Subscription> findByEmail(String email) {
+
+        List<Subscription> subscriptions = new ArrayList<>();
+        ItemCollection<QueryOutcome> items = queryOutcomeItemCollection(email);
+
+        for (Item item : items) {
+            subscriptions.add(mapItemToSubscription(item));
+        }
+
+        return subscriptions;
     }
 
     @Override
@@ -145,5 +150,12 @@ public class DynamoDbSubscriptionRepository implements SubscriptionRepository {
         subscription.setMotIdentification(new MotIdentification(item.getString("mot_test_number"), item.getString("dvla_id")));
         subscription.setContactType(Subscription.ContactType.valueOf(item.getString("contact_type")));
         return subscription;
+    }
+
+    private ItemCollection<QueryOutcome> queryOutcomeItemCollection(String email) {
+
+        return dynamoDb
+                .getTable(tableName)
+                .query(new QuerySpec().withHashKey("email", email));
     }
 }

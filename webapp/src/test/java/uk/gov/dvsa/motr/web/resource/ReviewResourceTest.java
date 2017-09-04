@@ -9,10 +9,12 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.cookie.SubscriptionConfirmationParams;
 import uk.gov.dvsa.motr.web.test.render.TemplateEngineStub;
+import uk.gov.dvsa.motr.web.validator.PhoneNumberValidator;
 import uk.gov.dvsa.motr.web.viewmodel.ReviewViewModel;
 
 import java.time.LocalDate;
@@ -47,10 +49,13 @@ public class ReviewResourceTest {
     @Before
     public void setUp() {
 
+        PhoneNumberValidator phoneNumberValidator = mock(PhoneNumberValidator.class);
+
         this.resource = new ReviewResource(
                 MOTR_SESSION,
                 TEMPLATE_ENGINE_STUB,
                 PENDING_SUBSCRIPTION_SERVICE,
+                phoneNumberValidator,
                 PENDING_SMS_SUBSCRIPTION_SERVICE
         );
         when(MOTR_SESSION.getVrmFromSession()).thenReturn(VRM);
