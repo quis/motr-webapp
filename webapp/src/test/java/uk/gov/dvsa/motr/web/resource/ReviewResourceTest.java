@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -84,10 +85,13 @@ public class ReviewResourceTest {
         MotIdentification expectedMotIdentification = new MotIdentification(TEST_MOT_TEST_NUMBER, null);
         ArgumentCaptor<SubscriptionConfirmationParams> paramsArgumentCaptor = ArgumentCaptor.forClass(SubscriptionConfirmationParams.class);
 
+        PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse()
+                .setRedirectUri("email-confirmation-pending");
+
         when(MOTR_SESSION.getVehicleDetailsFromSession()).thenReturn(vehicleDetails);
         when(MOTR_SESSION.isUsingEmailChannel()).thenReturn(true);
         when(PENDING_SUBSCRIPTION_SERVICE.handlePendingSubscriptionCreation(any(), any(), any(), any(), any()))
-                .thenReturn("email-confirmation-pending");
+                .thenReturn(pendingSubscriptionResponse);
         doNothing().when(PENDING_SUBSCRIPTION_SERVICE).createPendingSubscription(
                 VRM, EMAIL, now, "randomID", expectedMotIdentification, CONTACT_TYPE);
 

@@ -42,7 +42,6 @@ public class SmsConfirmationService {
         return urlHelper.phoneConfirmationLink();
     }
 
-    //TODO: Take out vrm if not needed
     public String verifySmsConfirmation(String vrm, String phoneNumber, String confirmationId, String confirmationCode)
             throws InvalidConfirmationIdException {
 
@@ -53,12 +52,12 @@ public class SmsConfirmationService {
                 });
 
         if (smsConfirmation.getCode().equals(confirmationCode)
-                && smsConfirmation.getPhoneNumber().equals(phoneNumber)) {
+                && smsConfirmation.getPhoneNumber().equals(phoneNumber)
+                && smsConfirmation.getVrm().equals(vrm)) {
 
             return urlHelper.confirmSubscriptionLink(confirmationId);
         } else {
 
-            //TODO: What to return if code is invalid? urLHelper
             return "";
         }
     }
@@ -77,11 +76,12 @@ public class SmsConfirmationService {
         return urlHelper.phoneConfirmationLink();
     }
 
-    //TODO: Add params
     /**
      * Creates pending SMS subscription in the system to be verified by the user right away
-     * @param phoneNumber           subscription phone number
-     * @param confirmationCode      subscription confirmation code
+     * @param vrm                   Vehicle's Registration
+     * @param phoneNumber           Subscription phone number
+     * @param confirmationCode      Subscription confirmation code
+     * @param confirmationId      Subscription confirmation ID - used to link with a pending subscription
      */
     private void createSmsConfirmation(String vrm, String phoneNumber, String confirmationCode, String confirmationId) {
 

@@ -11,6 +11,7 @@ import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
 import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
+import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.eventlog.subscription.PendingSubscriptionCreatedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.PendingSubscriptionCreationFailedEvent;
 import uk.gov.dvsa.motr.web.formatting.MakeModelFormatter;
@@ -46,58 +47,27 @@ public class PendingSubscriptionService {
         this.client = client;
     }
 
-    public String handlePendingSubscriptionCreation(
+    public PendingSubscriptionServiceResponse handlePendingSubscriptionCreation(
             String vrm, String email, LocalDate motDueDate,
             MotIdentification motIdentification, Subscription.ContactType contactType) {
 
         Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
+        PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse();
 
         if (subscription.isPresent()) {
             updateSubscriptionMotDueDate(subscription.get(), motDueDate);
 
-            return contactType == Subscription.ContactType.EMAIL
-                    ? urlHelper.emailConfirmedNthTimeLink() : urlHelper.phoneConfirmedNthTimeLink();
+            String redirectUri = (contactType == Subscription.ContactType.EMAIL
+                    ? urlHelper.emailConfirmedNthTimeLink() : urlHelper.phoneConfirmedNthTimeLink());
+
+            return pendingSubscriptionResponse.setRedirectUri(redirectUri);
         } else {
             String confimrationId = generateId();
             createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
 
             return contactType == Subscription.ContactType.EMAIL
-                    ? urlHelper.emailConfirmationPendingLink() : confimrationId;
-        }
-    }
-
-    public String handlePendingSubscriptionCreationEmail(
-            String vrm, String email, LocalDate motDueDate,
-            MotIdentification motIdentification, Subscription.ContactType contactType) {
-
-        Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
-
-        if (subscription.isPresent()) {
-            updateSubscriptionMotDueDate(subscription.get(), motDueDate);
-
-            return urlHelper.emailConfirmedNthTimeLink();
-        } else {
-            createPendingSubscription(vrm, email, motDueDate, generateId(), motIdentification, contactType);
-
-            return urlHelper.emailConfirmationPendingLink();
-        }
-    }
-
-    public String handlePendingSubscriptionCreationSms(
-            String vrm, String email, LocalDate motDueDate,
-            MotIdentification motIdentification, Subscription.ContactType contactType) {
-
-        Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
-
-        if (subscription.isPresent()) {
-            updateSubscriptionMotDueDate(subscription.get(), motDueDate);
-
-            return urlHelper.phoneConfirmedNthTimeLink();
-        } else {
-            String confimrationId = generateId();
-            createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
-
-            return confimrationId;
+                    ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
+                    : pendingSubscriptionResponse.setConfirmationId(confimrationId);
         }
     }
 

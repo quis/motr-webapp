@@ -15,18 +15,6 @@ public class SmsConfirmationCodeValidator implements Validator {
     private String message;
     private String messageAtField;
 
-    public boolean isValid(String confirmationCode) {
-
-        if (confirmationCode == null || confirmationCode.isEmpty()) {
-            message = EMPTY_CONFIRMATION_CODE_MESSAGE;
-            messageAtField = EMPTY_CONFIRMATION_CODE_MESSAGE_AT_FIELD;
-
-            return false;
-        }
-
-        return validate(confirmationCode);
-    }
-
     public String getMessage() {
 
         return message;
@@ -45,6 +33,18 @@ public class SmsConfirmationCodeValidator implements Validator {
     public void setMessageAtField(String messageAtField) {
 
         this.messageAtField = messageAtField;
+    }
+
+    public boolean isValid(String confirmationCode) {
+
+        if (confirmationCode == null || confirmationCode.isEmpty()) {
+            message = EMPTY_CONFIRMATION_CODE_MESSAGE;
+            messageAtField = EMPTY_CONFIRMATION_CODE_MESSAGE_AT_FIELD;
+
+            return false;
+        }
+
+        return validate(confirmationCode);
     }
 
     private boolean validate(String confirmationCode) {

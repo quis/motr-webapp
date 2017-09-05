@@ -1,7 +1,10 @@
 package uk.gov.dvsa.motr.web.resource;
 
+import com.amazonaws.util.StringUtils;
+
 import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
+import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
 import uk.gov.dvsa.motr.web.component.subscription.service.PendingSubscriptionService;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
@@ -132,62 +135,33 @@ public class ReviewResource {
 
         if (detailsAreValid(vrm, contactFromSession) && null != vehicle) {
 
-            //TODO: Refactor. PhoneConfirmedURL will never be hit
-
-//            PendingSubscriptionResponse pendingSubscriptionResponse = pendingSubscriptionService.handlePendingSubscriptionCreation(
-//                    vrm,
-//                    contactFromSession,
-//                    vehicle.getMotExpiryDate(),
-//                    vehicle.getMotIdentification(),
-//                    contactType);
-//
-//            if (!pendingSubscriptionResponse.getRedirectUri().isNullorEmpty()) {
-//
-//                return redirectToNextScreenWithContact(pendingSubscriptionResponse.getRedirectUri(), contactFromSession);
-//            } else {
-//                String redirectUri = smsConfirmationService.handleSmsConfirmationCreation(
-//                        vrm,
-//                        contactFromSession,
-//                        pendingSubscriptionResponse.getConfirmationId());
-//
-//                return redirectToNextScreenWithContact(redirectUri, contactFromSession);
-//            }
-
-
-            if (motrSession.isUsingEmailChannel()) {
-
-                String redirectUri = pendingSubscriptionService.handlePendingSubscriptionCreation(
-                        vrm,
-                        contactFromSession,
-                        vehicle.getMotExpiryDate(),
-                        vehicle.getMotIdentification(),
-                        contactType);
-
-                return redirectToNextScreenWithContact(redirectUri, contactFromSession);
-            }
-
-            String confirmationId = pendingSubscriptionService.handlePendingSubscriptionCreation(
+            PendingSubscriptionServiceResponse pendingSubscriptionResponse = pendingSubscriptionService.handlePendingSubscriptionCreation(
                     vrm,
                     contactFromSession,
                     vehicle.getMotExpiryDate(),
                     vehicle.getMotIdentification(),
                     contactType);
 
-            motrSession.setConfirmationId(confirmationId);
+            String redirectUri = pendingSubscriptionResponse.getRedirectUri();
 
-            String redirectUri = smsConfirmationService.handleSmsConfirmationCreation(
-                    vrm,
-                    contactFromSession,
-                    confirmationId);
+            if (!StringUtils.isNullOrEmpty(pendingSubscriptionResponse.getConfirmationId())) {
 
-            return redirectToNextScreenWithContact(redirectUri, contactFromSession);
+                motrSession.setConfirmationId(pendingSubscriptionResponse.getConfirmationId());
+
+                redirectUri = smsConfirmationService.handleSmsConfirmationCreation(
+                        vrm,
+                        contactFromSession,
+                        pendingSubscriptionResponse.getConfirmationId());
+            }
+
+            return redirectToNextScreen(redirectUri, contactFromSession);
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactFromSession), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToNextScreenWithContact(String redirectUri, String contact) {
+    private Response redirectToNextScreen(String redirectUri, String contact) {
 
         SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setContact(contact);
