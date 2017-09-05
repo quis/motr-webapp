@@ -85,6 +85,11 @@ public class MotReminder {
         return enterReminderDetails(vrm, email).confirmSubscriptionDetailsNthTime();
     }
 
+    public SubscriptionConfirmationPage enterAndConfirmPendingReminderDetailsSecondTimePostSms(String vrm, String email) {
+
+        return enterReminderDetailsSmsToggleOn(vrm, email).confirmSubscriptionDetailsNthTime();
+    }
+
     public UnsubscribeConfirmationPage unsubscribeFromReminder(String vrm, String email) {
 
         return navigateToUnsubscribe(vrm, email).clickUnsubscribe();

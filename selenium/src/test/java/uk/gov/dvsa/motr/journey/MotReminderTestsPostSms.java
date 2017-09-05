@@ -70,7 +70,7 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         // When I create another MOT reminder subscription with the same VRM and email
         // Then I do not need to confirm my email address and am taken directly to the subscription confirmed page
-        motReminder.enterAndConfirmPendingReminderDetailsSecondTime(vrm, email);
+        motReminder.enterAndConfirmPendingReminderDetailsSecondTimePostSms(vrm, email);
     }
 
     @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
@@ -87,7 +87,7 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         // When I create another MOT reminder subscription with the same VRM and email
         // And I select an old confirm email link
-        motReminder.enterAndConfirmPendingReminderDetails(vrm, email);
+        motReminder.enterAndConfirmPendingReminderDetailsPostSms(vrm, email);
         String newConfirmationId = motReminder.subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
 
         // Then I am directed to the MOT Reminder not found error page
@@ -161,7 +161,6 @@ public class MotReminderTestsPostSms extends BaseTest {
         //Then the confirmation page is displayed confirming my active reminder subscription
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
-
 
     @DataProvider(name = "dataProviderCreateMotReminderForMyVehicle")
     public Object[][] dataProviderCreateMotReminderForMyVehicle() throws IOException {
