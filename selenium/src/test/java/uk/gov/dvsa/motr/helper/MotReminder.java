@@ -65,7 +65,7 @@ public class MotReminder {
 
     public SubscriptionConfirmationPage subscribeToReminderAndConfirmEmailPostSms(String vrm, String email) {
 
-        enterAndConfirmPendingReminderDetails(vrm, email);
+        enterAndConfirmPendingReminderDetailsPostSms(vrm, email);
 
         return navigateToEmailConfirmationPage(vrm, email);
     }
