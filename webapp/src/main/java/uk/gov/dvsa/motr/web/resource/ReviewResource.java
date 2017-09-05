@@ -154,17 +154,18 @@ public class ReviewResource {
                         pendingSubscriptionResponse.getConfirmationId());
             }
 
-            return redirectToNextScreen(redirectUri, contactFromSession);
+            return redirectToNextScreen(redirectUri, contactFromSession, contactType);
         } else {
             logger.debug("detailsAreValid() {} or vehicle is null: {}", detailsAreValid(vrm, contactFromSession), vehicle);
             throw new NotFoundException();
         }
     }
 
-    private Response redirectToNextScreen(String redirectUri, String contact) {
+    private Response redirectToNextScreen(String redirectUri, String contact, Subscription.ContactType contactType) {
 
         SubscriptionConfirmationParams params = new SubscriptionConfirmationParams();
         params.setContact(contact);
+        params.setContactType(contactType.getValue());
         motrSession.setSubscriptionConfirmationParams(params);
 
         return redirect(redirectUri);
