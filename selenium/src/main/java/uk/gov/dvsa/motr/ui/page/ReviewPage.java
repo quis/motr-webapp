@@ -11,6 +11,7 @@ public class ReviewPage extends Page {
 
     @FindBy(id = "change-registration-link") private WebElement changeRegistrationLink;
     @FindBy(id = "change-email-link") private WebElement changeEmailLink;
+    @FindBy(id = "change-mobile-link") private WebElement changeMobileLink;
     @FindBy(id = "continue-button") private WebElement continueButton;
 
     @Override
@@ -25,10 +26,16 @@ public class ReviewPage extends Page {
         return "Check your details – MOT reminders";
     }
 
-    public EmailConfirmationPendingPage confirmSubscriptionDetails() {
+    public EmailConfirmationPendingPage confirmSubscriptionDetailsOnEmailChannel() {
 
         continueButton.click();
         return new EmailConfirmationPendingPage();
+    }
+
+    public PhoneConfirmPage confirmSubscriptionDetailsOnMobileChannel() {
+
+        continueButton.click();
+        return new PhoneConfirmPage();
     }
 
     public SubscriptionConfirmationPage confirmSubscriptionDetailsNthTime() {
@@ -47,5 +54,11 @@ public class ReviewPage extends Page {
 
         changeRegistrationLink.click();
         return new VrmPage();
+    }
+
+    public PhoneNumberEntryPage clickChangeMobileNumber() {
+
+        changeMobileLink.click();
+        return new PhoneNumberEntryPage();
     }
 }

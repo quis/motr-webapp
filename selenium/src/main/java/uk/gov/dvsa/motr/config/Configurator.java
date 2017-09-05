@@ -135,6 +135,10 @@ public abstract class Configurator {
         return getProp("test.dynamoDb.pendingTable.name");
     }
 
+    public static String dynamoDbTableSmsConfirmName() {
+        return getProp("test.dynamoDb.smsConfirm.name");
+    }
+
     public String getChromeDriverPath() {
         return getProp("test.chromeDriverPath");
     }
