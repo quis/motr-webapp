@@ -168,8 +168,11 @@ public class MotReminderTestsPostSms extends BaseTest {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my mobile number
-        //Then I can confirm my mobile number via the sent code
-        motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
+        //And I can confirm my mobile number via the sent code
+        SubscriptionConfirmationPage subscriptionConfirmationPage = motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
+
+        //Then the confirmation page is displayed confirming my active reminder subscription
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
 
