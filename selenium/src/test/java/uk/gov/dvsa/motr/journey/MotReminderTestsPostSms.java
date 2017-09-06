@@ -8,6 +8,8 @@ import uk.gov.dvsa.motr.helper.RandomGenerator;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
+import uk.gov.dvsa.motr.ui.page.PhoneConfirmPage;
+import uk.gov.dvsa.motr.ui.page.PhoneNumberEntryPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationPage;
 import uk.gov.dvsa.motr.ui.page.UnsubscribeConfirmationPage;
@@ -156,7 +158,9 @@ public class MotReminderTestsPostSms extends BaseTest {
         //Given I am an owner of a new vehicle
         //When I enter the vehicle vrm and my email address
         //And I confirm my email address
-        SubscriptionConfirmationPage subscriptionConfirmationPage = motReminder.subscribeToReminderAndConfirmEmailPostSms(RandomGenerator.generateDvlaVrm() , RandomGenerator.generateEmail());
+        SubscriptionConfirmationPage subscriptionConfirmationPage =
+                motReminder.subscribeToReminderAndConfirmEmailPostSms(
+                        RandomGenerator.generateDvlaVrm(), RandomGenerator.generateEmail());
 
         //Then the confirmation page is displayed confirming my active reminder subscription
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
@@ -169,12 +173,63 @@ public class MotReminderTestsPostSms extends BaseTest {
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my mobile number
         //And I can confirm my mobile number via the sent code
-        SubscriptionConfirmationPage subscriptionConfirmationPage = motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
+        SubscriptionConfirmationPage subscriptionConfirmationPage =
+                motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
 
         //Then the confirmation page is displayed confirming my active reminder subscription
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
+    @Test(groups = {"PostSms"})
+    public void canCreateSMSReminderWhenVehicleDoesNotHaveAnMotYet() {
+
+        //Given I am an owner of a new vehicle
+        //When I enter the new vehicle vrm and my mobile number
+        //And I confirm my mobile number
+        SubscriptionConfirmationPage subscriptionConfirmationPage =
+                motReminder.subscribeToReminderAndConfirmMobileNumber(
+                        RandomGenerator.generateDvlaVrm(), RandomGenerator.generateMobileNumber());
+
+        //Then the confirmation page is displayed confirming my active reminder subscription
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+    }
+
+    @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
+            groups = {"PostSms"})
+    public void canChangeMobileNumberFromReviewWhenCreatingReminder(String vrm, String mobileNumber) {
+
+        //Given I am a vehicle owner on the MOTR start page
+        //When I enter the vehicle vrm and mobile number
+        ReviewPage reviewPage = motReminder.enterReminderDetailsUsingMobileChannel(vrm, mobileNumber);
+
+        //And I update my mobile number
+        String newMobileNumber = RandomGenerator.generateMobileNumber();
+        PhoneNumberEntryPage phoneNumberEntryPageFromReview = reviewPage.clickChangeMobileNumber();
+        ReviewPage reviewPageSubmit = phoneNumberEntryPageFromReview.enterPhoneNumber(newMobileNumber);
+
+        //Then confirm mobile number
+        PhoneConfirmPage phoneConfirmPage = reviewPageSubmit.confirmSubscriptionDetailsOnMobileChannel();
+        SubscriptionConfirmationPage subscriptionConfirmationPage =
+                phoneConfirmPage.enterConfirmationCode(motReminder.smsConfirmationCode(vrm, newMobileNumber));
+
+        //Then my mot reminder is set up successfully with the updated mobile number
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+    }
+
+    @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
+            groups = {"PostSms"})
+    public void createDuplicateMOTSMSReminderDoesNotNeedToConfirmMobileNumberAgain(String vrm, String mobileNumber) {
+
+        // Given I am a user of the MOT reminders service with an active SMS subscription
+        motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
+
+        // When I create another MOT reminder subscription with the same VRM and mobile number
+        SubscriptionConfirmationPage subscriptionConfirmationPage =
+                motReminder.enterAndConfirmReminderDetailsSecondTimeOnMobileChannel(vrm, mobileNumber);
+
+        // Then I do not need to confirm my mobile number again and am taken directly to the subscription confirmed page
+        assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
+    }
 
     @DataProvider(name = "dataProviderCreateEmailMotReminderForMyVehicle")
     public Object[][] dataProviderCreateEmailMotReminderForMyVehicle() throws IOException {
