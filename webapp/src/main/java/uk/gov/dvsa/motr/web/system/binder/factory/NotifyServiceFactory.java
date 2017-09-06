@@ -25,14 +25,14 @@ public class NotifyServiceFactory implements BaseFactory<NotifyService> {
     public NotifyService provide() {
 
         String apiKey = this.config.getValue(GOV_NOTIFY_API_TOKEN);
-        String subscriptionConfirmationTemplateId = this.config.getValue(SUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
+        String emailSubscriptionConfirmationTemplateId = this.config.getValue(SUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
         String emailConfirmationTemplateId = this.config.getValue(EMAIL_CONFIRMATION_TEMPLATE_ID);
         String smsConfirmationTemplateId = this.config.getValue(SMS_CONFIRM_PHONE_TEMPLATE_ID);
         String smsSubscriptionConfirmationTemplateId = this.config.getValue(SMS_SUBSCRIPTION_CONFIRMATION_TEMPLATE_ID);
         NotificationClient client = new NotificationClient(apiKey);
 
         return new NotifyService(client,
-                subscriptionConfirmationTemplateId,
+                emailSubscriptionConfirmationTemplateId,
                 emailConfirmationTemplateId,
                 smsSubscriptionConfirmationTemplateId,
                 smsConfirmationTemplateId);

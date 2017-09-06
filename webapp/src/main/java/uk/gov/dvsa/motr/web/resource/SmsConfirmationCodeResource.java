@@ -1,8 +1,8 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
-import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.SmsConfirmationCodeValidator;
@@ -39,17 +39,20 @@ public class SmsConfirmationCodeResource {
 
     private DataLayerHelper dataLayerHelper;
     private SmsConfirmationService smsConfirmationService;
+    private UrlHelper urlHelper;
 
     @Inject
     public SmsConfirmationCodeResource(
             MotrSession motrSession,
             TemplateEngine renderer,
+            UrlHelper urlHelper,
             SmsConfirmationService smsConfirmationService
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
         this.smsConfirmationService = smsConfirmationService;
+        this.urlHelper = urlHelper;
     }
 
     @GET
@@ -79,10 +82,11 @@ public class SmsConfirmationCodeResource {
             String vrm = motrSession.getVrmFromSession();
             String confirmationId = motrSession.getConfirmationIdFromSession();
 
-            String redirectUri = smsConfirmationService.verifySmsConfirmation(vrm, phoneNumber, confirmationId, confirmationCode);
+            Boolean confirmationCodeVerified = smsConfirmationService.verifySmsConfirmationCode(
+                    vrm, phoneNumber, confirmationId, confirmationCode);
 
-            if (!redirectUri.equals("")) {
-                return redirect(redirectUri);
+            if (confirmationCodeVerified) {
+                return redirect(urlHelper.confirmSubscriptionLink(confirmationId));
             }
 
             validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);

@@ -42,7 +42,7 @@ public class SmsConfirmationService {
         return urlHelper.phoneConfirmationLink();
     }
 
-    public String verifySmsConfirmation(String vrm, String phoneNumber, String confirmationId, String confirmationCode)
+    public Boolean verifySmsConfirmationCode(String vrm, String phoneNumber, String confirmationId, String confirmationCode)
             throws InvalidConfirmationIdException {
 
         SmsConfirmation smsConfirmation = smsConfirmationRepository.findByConfirmationId(confirmationId)
@@ -51,15 +51,9 @@ public class SmsConfirmationService {
                     return new InvalidConfirmationIdException();
                 });
 
-        if (smsConfirmation.getCode().equals(confirmationCode)
+        return (smsConfirmation.getCode().equals(confirmationCode)
                 && smsConfirmation.getPhoneNumber().equals(phoneNumber)
-                && smsConfirmation.getVrm().equals(vrm)) {
-
-            return urlHelper.confirmSubscriptionLink(confirmationId);
-        } else {
-
-            return "";
-        }
+                && smsConfirmation.getVrm().equals(vrm));
     }
 
     public String resendSms(String phoneNumber, String confirmationId)

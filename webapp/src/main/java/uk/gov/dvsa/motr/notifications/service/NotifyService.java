@@ -19,21 +19,21 @@ import static uk.gov.dvsa.motr.web.eventlog.subscription.NotifyClientFailedEvent
 public class NotifyService {
 
     private NotificationClient notificationClient;
-    private String subscriptionConfirmationTemplateId;
+    private String emailSubscriptionConfirmationTemplateId;
     private String emailConfirmationTemplateId;
     private String smsSubscriptionConfirmationTemplateId;
     private String smsConfirmationTemplateId;
 
     public NotifyService(
             NotificationClient notificationClient,
-            String subscriptionConfirmationTemplateId,
+            String emailSubscriptionConfirmationTemplateId,
             String emailConfirmationTemplateId,
             String smsSubscriptionConfirmationTemplateId,
             String smsConfirmationTemplateId
     ) {
 
         this.notificationClient = notificationClient;
-        this.subscriptionConfirmationTemplateId = subscriptionConfirmationTemplateId;
+        this.emailSubscriptionConfirmationTemplateId = emailSubscriptionConfirmationTemplateId;
         this.emailConfirmationTemplateId = emailConfirmationTemplateId;
         this.smsSubscriptionConfirmationTemplateId = smsSubscriptionConfirmationTemplateId;
         this.smsConfirmationTemplateId = smsConfirmationTemplateId;
@@ -60,7 +60,7 @@ public class NotifyService {
 
         try {
 
-            notificationClient.sendEmail(subscriptionConfirmationTemplateId, emailAddress, personalisation, "");
+            notificationClient.sendEmail(emailSubscriptionConfirmationTemplateId, emailAddress, personalisation, "");
 
         } catch (NotificationClientException e) {
 

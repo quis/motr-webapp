@@ -32,6 +32,8 @@ import static java.util.Collections.emptyMap;
 @Produces("text/html")
 public class SubscriptionConfirmedResource {
 
+    private static final String REPLY_PHONE_NUMBER = "07491163040";
+
     private final TemplateEngine renderer;
     private final DataLayerHelper dataLayerHelper;
     private SubscriptionConfirmationService subscriptionConfirmationService;
@@ -100,7 +102,7 @@ public class SubscriptionConfirmedResource {
 
             if (subscription.getContactType().equals(Subscription.ContactType.MOBILE.getValue())) {
                 modelMap.put("usingSms", true);
-                modelMap.put("replyNumber", "07491163040");
+                modelMap.put("replyNumber", REPLY_PHONE_NUMBER);
                 modelMap.put("registration", subscription.getRegistration());
             }
 
