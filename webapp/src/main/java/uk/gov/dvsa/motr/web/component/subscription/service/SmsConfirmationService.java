@@ -56,8 +56,7 @@ public class SmsConfirmationService {
                 && smsConfirmation.getVrm().equals(vrm));
     }
 
-    public String resendSms(String phoneNumber, String confirmationId)
-            throws InvalidConfirmationIdException {
+    public String resendSms(String phoneNumber, String confirmationId) throws InvalidConfirmationIdException {
 
         SmsConfirmation smsConfirmation = smsConfirmationRepository.findByConfirmationId(confirmationId)
                 .orElseThrow(() -> {
