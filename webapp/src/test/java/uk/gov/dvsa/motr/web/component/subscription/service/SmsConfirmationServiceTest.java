@@ -24,7 +24,6 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,11 +31,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import static uk.gov.dvsa.motr.web.component.subscription.service.RandomIdGenerator.generateId;
-
 import static java.util.Optional.empty;
 
-public class PendingSubscriptionServiceTest {
+public class SmsConfirmationServiceTest {
 
     private final PendingSubscriptionRepository pendingSubscriptionRepository = mock(PendingSubscriptionRepository.class);
     private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);

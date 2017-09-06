@@ -48,10 +48,10 @@ public class PendingSubscriptionService {
     }
 
     public PendingSubscriptionServiceResponse handlePendingSubscriptionCreation(
-            String vrm, String email, LocalDate motDueDate,
+            String vrm, String contact, LocalDate motDueDate,
             MotIdentification motIdentification, Subscription.ContactType contactType) {
 
-        Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, email);
+        Optional<Subscription> subscription = subscriptionRepository.findByVrmAndEmail(vrm, contact);
         PendingSubscriptionServiceResponse pendingSubscriptionResponse = new PendingSubscriptionServiceResponse();
 
         if (subscription.isPresent()) {
@@ -63,7 +63,7 @@ public class PendingSubscriptionService {
             return pendingSubscriptionResponse.setRedirectUri(redirectUri);
         } else {
             String confimrationId = generateId();
-            createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
+            createPendingSubscription(vrm, contact, motDueDate, confimrationId, motIdentification, contactType);
 
             return contactType == Subscription.ContactType.EMAIL
                     ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())
@@ -74,19 +74,19 @@ public class PendingSubscriptionService {
     /**
      * Creates pending subscription in the system to be confirmed later by confirmation link
      * @param vrm        subscription vrm
-     * @param email      subscription email
+     * @param contact      subscription contact
      * @param motDueDate most recent mot due date
      * @param confirmationId confirmation id
      * @param motIdentification the identifier for this vehicle (may be dvla id or mot test number)
      */
     public void createPendingSubscription(
-            String vrm, String email, LocalDate motDueDate,
+            String vrm, String contact, LocalDate motDueDate,
             String confirmationId, MotIdentification motIdentification,
             Subscription.ContactType contactType) {
 
         PendingSubscription pendingSubscription = new PendingSubscription()
                 .setConfirmationId(confirmationId)
-                .setEmail(email)
+                .setContact(contact)
                 .setVrm(vrm)
                 .setMotDueDate(motDueDate)
                 .setMotIdentification(motIdentification)
@@ -99,18 +99,18 @@ public class PendingSubscriptionService {
 
                 VehicleDetails vehicleDetails = VehicleDetailsService.getVehicleDetails(vrm, client);
                 notifyService.sendEmailAddressConfirmationEmail(
-                        email,
+                        contact,
                         urlHelper.confirmSubscriptionLink(pendingSubscription.getConfirmationId()),
                         MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails, ", ") + vrm
                 );
             }
             EventLogger.logEvent(
-                    new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
+                    new PendingSubscriptionCreatedEvent().setVrm(vrm).setEmail(contact).setMotDueDate(motDueDate)
                     .setMotIdentification(motIdentification)
             );
         } catch (Exception e) {
             EventLogger.logErrorEvent(
-                    new PendingSubscriptionCreationFailedEvent().setVrm(vrm).setEmail(email).setMotDueDate(motDueDate)
+                    new PendingSubscriptionCreationFailedEvent().setVrm(vrm).setEmail(contact).setMotDueDate(motDueDate)
                     .setMotIdentification(motIdentification), e);
             throw e;
         }

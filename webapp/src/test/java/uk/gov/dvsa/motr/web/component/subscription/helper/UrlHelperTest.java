@@ -34,9 +34,21 @@ public class UrlHelperTest {
     }
 
     @Test
+    public void testPhoneConfirmedNthTimeLink() throws Exception {
+
+        assertEquals(baseUri + "confirm-subscription/confirmed", urlHelper.phoneConfirmedNthTimeLink());
+    }
+
+    @Test
     public void testEmailAlreadyConfirmedLink() throws Exception {
 
         assertEquals(baseUri + "confirm-subscription/already-confirmed", urlHelper.emailConfirmedNthTimeLink());
+    }
+
+    @Test
+    public void testPhoneConfirmationLink() throws Exception {
+
+        assertEquals(baseUri + "confirm-phone", urlHelper.phoneConfirmationLink());
     }
 
     @Test

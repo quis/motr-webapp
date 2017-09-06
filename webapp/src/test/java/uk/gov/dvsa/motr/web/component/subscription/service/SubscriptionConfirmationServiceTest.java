@@ -68,7 +68,7 @@ public class SubscriptionConfirmationServiceTest {
         verify(subscriptionRepository, times(1)).save(any(Subscription.class));
         verify(pendingSubscriptionRepository, times(1)).delete(pendingSubscription);
         verify(notifyService, times(1)).sendSubscriptionConfirmationEmail(
-                eq(pendingSubscription.getEmail()),
+                eq(pendingSubscription.getContact()),
                 eq(pendingSubscription.getVrm()),
                 eq(pendingSubscription.getMotDueDate()),
                 anyString(),
@@ -97,7 +97,7 @@ public class SubscriptionConfirmationServiceTest {
         return new PendingSubscription()
                 .setConfirmationId(CONFIRMATION_ID)
                 .setMotDueDate(DATE)
-                .setEmail(EMAIL)
+                .setContact(EMAIL)
                 .setVrm(VRM)
                 .setContactType(CONTACT_TYPE);
     }

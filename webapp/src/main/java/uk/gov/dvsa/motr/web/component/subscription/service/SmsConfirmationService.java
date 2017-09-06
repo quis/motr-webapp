@@ -20,8 +20,8 @@ public class SmsConfirmationService {
     private NotifyService notifyService;
     private UrlHelper urlHelper;
 
-    private static final int ATTEMPTS = 0;
-    private static final int RESEND_ATTEMPTS = 0;
+    private static final int INITIAL_ATTEMPTS = 0;
+    private static final int INITIAL_RESEND_ATTEMPTS = 0;
 
     @Inject
     public SmsConfirmationService(
@@ -90,8 +90,8 @@ public class SmsConfirmationService {
                 .setCode(confirmationCode)
                 .setVrm(vrm)
                 .setConfirmationId(confirmationId)
-                .setAttempts(ATTEMPTS)
-                .setResendAttempts(RESEND_ATTEMPTS);
+                .setAttempts(INITIAL_ATTEMPTS)
+                .setResendAttempts(INITIAL_RESEND_ATTEMPTS);
 
         try {
 

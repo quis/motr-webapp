@@ -76,7 +76,7 @@ public class SubscriptionConfirmationService {
 
             EventLogger.logErrorEvent(new SubscriptionConfirmationFailedEvent()
                     .setVrm(pendingSubscription.getVrm())
-                    .setEmail(pendingSubscription.getEmail())
+                    .setEmail(pendingSubscription.getContact())
                     .setDueDate(pendingSubscription.getMotDueDate()));
             throw e;
         }
@@ -87,7 +87,7 @@ public class SubscriptionConfirmationService {
         Subscription subscription = new Subscription()
                 .setUnsubscribeId(generateId())
                 .setVrm(pendingSubscription.getVrm())
-                .setEmail(pendingSubscription.getEmail())
+                .setEmail(pendingSubscription.getContact())
                 .setMotDueDate(pendingSubscription.getMotDueDate())
                 .setMotIdentification(pendingSubscription.getMotIdentification())
                 .setContactType(pendingSubscription.getContactType());
