@@ -23,9 +23,9 @@ import static org.testng.Assert.assertTrue;
 public class MotReminderTestsPostSms extends BaseTest {
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Owner of a vehicle with a mot is able to set up a MOT reminder with their VRM and email and unsubscribe from it",
+            description = "Owner of a vehicle with a mot is able to set up an email MOT reminder with their VRM and email and unsubscribe from it",
             groups = {"PostSms"})
-    public void createMotReminderForMyVehicleThenUnsubscribe(String vrm, String email) throws IOException, InterruptedException {
+    public void createEmailMotReminderForMyVehicleThenUnsubscribe(String vrm, String email) throws IOException, InterruptedException {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
@@ -46,7 +46,7 @@ public class MotReminderTestsPostSms extends BaseTest {
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "After confirming the reminder the user can click the link to go back to the start page",
             groups = {"PostSms"})
-    public void afterConfirmationOfReminderUserCanGoToStartPageToSignUpAgain(String vrm, String email) throws Exception {
+    public void afterConfirmationOfEmailReminderUserCanGoToStartPageToSignUpAgain(String vrm, String email) throws Exception {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
@@ -59,10 +59,10 @@ public class MotReminderTestsPostSms extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Reminder subscriber with an active subscription creates another subscription with the same VRM and email" +
+            description = "Reminder subscriber with an active email subscription creates another email subscription with the same VRM and email" +
                     " does not need to confirm their email again",
             groups = {"PostSms"})
-    public void createDuplicateMOTReminderDoesNotNeedToConfirmEmailAddressAgain(String vrm, String email)
+    public void createDuplicateEmailMotReminderDoesNotNeedToConfirmEmailAddressAgain(String vrm, String email)
             throws IOException, InterruptedException {
 
         // Given I am a user of the MOT reminders service with an active subscription
@@ -74,10 +74,10 @@ public class MotReminderTestsPostSms extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "Reminder subscriber with multiple pending subscriptions is directed to the confirm email error page when " +
+            description = "Email reminder subscriber with multiple pending email subscriptions is directed to the confirm email error page when " +
                     "selecting an old confirm email link",
             groups = {"PostSms"})
-    public void userWithDuplicatePendingMotSubscriptionsIsDirectedToConfirmEmailErrorPageWhenSelectingOldConfirmEmailLink(
+    public void userWithDuplicatePendingEmailMotSubscriptionsIsDirectedToConfirmEmailErrorPageWhenSelectingOldConfirmEmailLink(
             String vrm, String email
     ) throws IOException, InterruptedException {
 
@@ -98,9 +98,9 @@ public class MotReminderTestsPostSms extends BaseTest {
     }
 
     @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
-            description = "A user who has previously unsubscribed from reminders will be displayed the unsubscribe error page",
+            description = "A user who has previously unsubscribed from an email reminder will be displayed the unsubscribe error page",
             groups = {"PostSms"})
-    public void reminderThatHasBeenUnsubscribedDisplaysErrorPage(String vrm, String email) {
+    public void emailReminderThatHasBeenUnsubscribedDisplaysErrorPage(String vrm, String email) {
 
         //Given I am a user of the MOT reminders service with an active subscription
         //When I unsubscribe from the email reminder via the unsubscribe link
@@ -115,9 +115,9 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(errorPage.getErrorMessageText(), "You've already unsubscribed or the link hasn't worked.");
     }
 
-    @Test(description = "Owner of a vehicle with a mot can change their email when creating MOT reminder",
+    @Test(description = "Owner of a vehicle with a mot can change their email when creating an MOT email reminder",
             groups = {"PostSms"})
-    public void canChangeEmailFromReviewWhenCreatingReminder() {
+    public void canChangeEmailFromReviewWhenCreatingEmailReminder() {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my email address
@@ -149,9 +149,9 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(confirmPage.getTitle(), "One more step");
     }
 
-    @Test(description = "Owner of a new vehicle with no mot is able to set up a MOT reminder with their VRM and email",
+    @Test(description = "Owner of a new vehicle with no mot is able to set up a MOT email reminder with their VRM and email",
             groups = {"PostSms"})
-    public void canCreateAReminderWhenVehicleDoesNotHaveAnMotYet() {
+    public void canCreateAnEmailReminderWhenVehicleDoesNotHaveAnMotYet() {
 
         //Given I am an owner of a new vehicle
         //When I enter the vehicle vrm and my email address
@@ -164,7 +164,7 @@ public class MotReminderTestsPostSms extends BaseTest {
 
     @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
             groups = {"PostSms"})
-    public void createMotReminderForMyVehicleUsingMobile(String vrm, String mobileNumber) {
+    public void createSMSMotReminderForMyVehicleUsingMobile(String vrm, String mobileNumber) {
 
         //Given I am a vehicle owner on the MOTR start page
         //When I enter the vehicle vrm and my mobile number
