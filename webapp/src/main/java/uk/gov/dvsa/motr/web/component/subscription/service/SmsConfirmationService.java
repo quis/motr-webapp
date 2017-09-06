@@ -77,7 +77,7 @@ public class SmsConfirmationService {
      * @param confirmationCode      Subscription confirmation code
      * @param confirmationId      Subscription confirmation ID - used to link with a pending subscription
      */
-    private void createSmsConfirmation(String vrm, String phoneNumber, String confirmationCode, String confirmationId) {
+    public void createSmsConfirmation(String vrm, String phoneNumber, String confirmationCode, String confirmationId) {
 
         SmsConfirmation smsConfirmation = new SmsConfirmation()
                 .setPhoneNumber(phoneNumber)

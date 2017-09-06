@@ -74,16 +74,19 @@ public class ReviewResource {
             contactTypeFromSession = "Email address";
             map.put("changeContactUrl", "/email");
             map.put("correctContactType", "email address");
+            map.put("changeContactId", "change-email-link");
         } else if (motrSession.isUsingSmsChannel()) {
             contactFromSession = this.motrSession.getPhoneNumberFromSession();
             contactTypeFromSession = "Mobile number";
             map.put("changeContactUrl", "/phone-number");
             map.put("correctContactType", "mobile number");
+            map.put("changeContactId", "change-mobile-link");
         } else {
             contactFromSession = "";
             contactTypeFromSession = "";
             map.put("changeContactUrl", "/");
             map.put("correctContactType", "");
+            map.put("changeContactId", "");
         }
 
         VehicleDetails vehicle = this.motrSession.getVehicleDetailsFromSession();

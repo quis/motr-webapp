@@ -5,24 +5,15 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import uk.gov.dvsa.motr.notifications.service.NotifyService;
-import uk.gov.dvsa.motr.remote.vehicledetails.MotIdentification;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
-import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetailsClient;
 import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
-import uk.gov.dvsa.motr.web.component.subscription.model.PendingSubscription;
+import uk.gov.dvsa.motr.web.component.subscription.model.SmsConfirmation;
 import uk.gov.dvsa.motr.web.component.subscription.model.Subscription;
-import uk.gov.dvsa.motr.web.component.subscription.persistence.PendingSubscriptionRepository;
-import uk.gov.dvsa.motr.web.component.subscription.persistence.SubscriptionRepository;
-import uk.gov.dvsa.motr.web.component.subscription.response.PendingSubscriptionServiceResponse;
+import uk.gov.dvsa.motr.web.component.subscription.persistence.SmsConfirmationRepository;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -31,22 +22,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import static java.util.Optional.empty;
-
 public class SmsConfirmationServiceTest {
 
-    private final PendingSubscriptionRepository pendingSubscriptionRepository = mock(PendingSubscriptionRepository.class);
-    private final SubscriptionRepository subscriptionRepository = mock(SubscriptionRepository.class);
+    private final SmsConfirmationRepository smsConfirmationRepository = mock(SmsConfirmationRepository.class);
     private final NotifyService notifyService = mock(NotifyService.class);
     private final UrlHelper urlHelper = mock(UrlHelper.class);
-    private final VehicleDetailsClient client = mock(VehicleDetailsClient.class);
 
     private static final String TEST_VRM = "TEST-REG";
-    private static final String EMAIL = "TEST@TEST.com";
     private static final String MOBILE = "07912345678";
     private static final String CONFIRMATION_ID = "Asd";
-    private static final String CONFIRMATION_LINK = "CONFIRMATION_LINK";
-    private static final String EMAIL_ALREADY_CONFIRMED_LINK = "ALREADY_CONFIRMED_LINK";
+    private static final String CONFIRMATION_CODE = "123456";
+    private static final int INITIAL_ATTEMPTS = 0;
+    private static final int INITIAL_RESEND_ATTEMPTS = 0;
+    private static final String PHONE_CONFIRMATION_LINK = "PHONE_CONFIRMATION_LINK";
     private static final String PHONE_ALREADY_CONFIRMED_LINK = "PHONE_ALREADY_CONFIRMED_LINK";
     private static final String CONFIRMATION_PENDING_LINK = "CONFIRMATION_PENDING_LINK";
     private static final String TEST_MOT_TEST_NUMBER = "123456";
@@ -54,154 +42,61 @@ public class SmsConfirmationServiceTest {
     private static final Subscription.ContactType CONTACT_TYPE_EMAIL = Subscription.ContactType.EMAIL;
     private static final Subscription.ContactType CONTACT_TYPE_MOBILE = Subscription.ContactType.MOBILE;
 
-    private PendingSubscriptionService subscriptionService;
+    private SmsConfirmationService smsConfirmationService;
 
     @Before
     public void setUp() {
 
-        this.subscriptionService = new PendingSubscriptionService(
-                pendingSubscriptionRepository,
-                subscriptionRepository,
+        this.smsConfirmationService = new SmsConfirmationService(
+                smsConfirmationRepository,
                 notifyService,
-                urlHelper,
-                client
+                urlHelper
         );
 
-        when(urlHelper.confirmSubscriptionLink(CONFIRMATION_ID)).thenReturn(CONFIRMATION_LINK);
-        when(urlHelper.emailConfirmedNthTimeLink()).thenReturn(EMAIL_ALREADY_CONFIRMED_LINK);
-        when(urlHelper.phoneConfirmedNthTimeLink()).thenReturn(PHONE_ALREADY_CONFIRMED_LINK);
-        when(urlHelper.emailConfirmationPendingLink()).thenReturn(CONFIRMATION_PENDING_LINK);
-    }
-
-    @Test
-    public void saveSubscriptionEmailCallsDbToSaveDetailsAndSendsNotification() throws Exception {
-        VehicleDetails vehicleDetails = new VehicleDetails();
-        vehicleDetails.setMake("TEST-MAKE");
-        vehicleDetails.setModel("TEST-MODEL");
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
-
-        withExpectedSubscription(empty(), EMAIL);
-        when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(empty());
-        doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK, "TEST-MAKE TEST-MODEL, ");
-        LocalDate date = LocalDate.now();
-
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
-
-        verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
-        verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(
-                EMAIL,
-                CONFIRMATION_LINK,
-                "TEST-MAKE TEST-MODEL, TEST-REG"
-        );
-    }
-
-    @Test
-    public void saveSubscriptionMobileCallsDbToSaveDetailsButDoesNotSendNotification() throws Exception {
-        VehicleDetails vehicleDetails = new VehicleDetails();
-        vehicleDetails.setMake("TEST-MAKE");
-        vehicleDetails.setModel("TEST-MODEL");
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
-
-        withExpectedSubscription(empty(), MOBILE);
-        when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(empty());
-        LocalDate date = LocalDate.now();
-
-        this.subscriptionService.createPendingSubscription(TEST_VRM, MOBILE, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE);
-
-        verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
-        verifyZeroInteractions(notifyService);;
+        when(urlHelper.phoneConfirmationLink()).thenReturn(PHONE_CONFIRMATION_LINK);
     }
 
     @Test(expected = RuntimeException.class)
-    public void whenDbSaveFailsConfirmationEmailIsNotSent() throws Exception {
+    public void whenDbSaveFailsConfirmationSmsIsNotSent() throws Exception {
 
-        withExpectedSubscription(empty(), EMAIL);
-        doThrow(new RuntimeException()).when(pendingSubscriptionRepository).save(any(PendingSubscription.class));
+        doThrow(new RuntimeException()).when(smsConfirmationRepository).save(any(SmsConfirmation.class));
         LocalDate date = LocalDate.now();
 
-        this.subscriptionService.createPendingSubscription(TEST_VRM, EMAIL, date, CONFIRMATION_ID,
-                new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
-        verify(pendingSubscriptionRepository, times(1)).save(any(PendingSubscription.class));
+        this.smsConfirmationService.createSmsConfirmation(TEST_VRM, MOBILE, CONFIRMATION_CODE, CONFIRMATION_ID);
+        verify(smsConfirmationRepository, times(1)).save(any(SmsConfirmation.class));
         verifyZeroInteractions(notifyService);
     }
 
     @Test
-    public void handleSubscriptionWithExistingSubscriptionWillUpdateMotExpiryDate() throws Exception {
+    public void createSmsConfirmationCallsDbToSaveDetailsAndSendsNotification() throws Exception {
 
-        withExpectedSubscription(Optional.of(new Subscription()), EMAIL);
-        LocalDate date = LocalDate.now();
-        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        doNothing().when(notifyService).sendPhoneNumberConfirmationSms(MOBILE, CONFIRMATION_CODE);
 
-        PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
+        this.smsConfirmationService.createSmsConfirmation(TEST_VRM, MOBILE, CONFIRMATION_CODE, CONFIRMATION_ID);
 
-        verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
-        assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
-        assertEquals(EMAIL_ALREADY_CONFIRMED_LINK, pendingSubscriptionResponse.getRedirectUri());
-        assertNull(pendingSubscriptionResponse.getConfirmationId());
-        verifyZeroInteractions(pendingSubscriptionRepository);
+        verify(smsConfirmationRepository, times(1)).save(any(SmsConfirmation.class));
+        verify(notifyService, times(1)).sendPhoneNumberConfirmationSms(MOBILE,CONFIRMATION_CODE);
     }
 
     @Test
-    public void handleSubscriptionWithExistingMobileSubscriptionWillUpdateMotExpiryDateAndReturnCorrectRedirectUri() throws Exception {
+    public void handleSmsConfirmationCreationWillCreateSmsConfirmation() {
 
-        withExpectedSubscription(Optional.of(new Subscription()), MOBILE);
-        LocalDate date = LocalDate.now();
-        ArgumentCaptor<Subscription> subscriptionArgumentCaptor = ArgumentCaptor.forClass(Subscription.class);
+        ArgumentCaptor<SmsConfirmation> smsConfirmationArgumentCaptor = ArgumentCaptor.forClass(SmsConfirmation.class);
 
-        PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE);
+        String redirectUri = this.smsConfirmationService.handleSmsConfirmationCreation(TEST_VRM, MOBILE, CONFIRMATION_ID);
 
-        verify(subscriptionRepository, times(1)).save(subscriptionArgumentCaptor.capture());
-        assertEquals(subscriptionArgumentCaptor.getValue().getMotDueDate(), date);
-        assertEquals(PHONE_ALREADY_CONFIRMED_LINK, pendingSubscriptionResponse.getRedirectUri());
-        assertNull(pendingSubscriptionResponse.getConfirmationId());
-        verifyZeroInteractions(pendingSubscriptionRepository);
+        verify(smsConfirmationRepository, times(1)).save(smsConfirmationArgumentCaptor.capture());
+        verify(notifyService, times(1)).sendPhoneNumberConfirmationSms(any(), any());
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getAttempts(), INITIAL_ATTEMPTS);
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getPhoneNumber(), MOBILE);
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getVrm(), TEST_VRM);
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getConfirmationId(), CONFIRMATION_ID);
+        assertEquals(smsConfirmationArgumentCaptor.getValue().getResendAttempts(), INITIAL_RESEND_ATTEMPTS);
+        assertEquals(PHONE_CONFIRMATION_LINK, redirectUri);
     }
 
     @Test
-    public void handleSubscriptionWithEmailContactWillCreateNewPendingSubscription() throws Exception {
+    public void verifySmsConfirmationCodeWillReturnTrueWhenCodeIsValidForThatRecord() {
 
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
-        withExpectedSubscription(empty(), EMAIL);
-        LocalDate date = LocalDate.now();
-        ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
-
-        PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, EMAIL, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_EMAIL);
-
-        verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
-        verify(notifyService, times(1)).sendEmailAddressConfirmationEmail(any(), any(), any());
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContact(), EMAIL);
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getVrm(), TEST_VRM);
-        assertEquals(CONFIRMATION_PENDING_LINK, pendingSubscriptionResponse.getRedirectUri());
-        assertNull(pendingSubscriptionResponse.getConfirmationId());
-    }
-
-    @Test
-    public void handleSubscriptionWithMobileContactWillCreateNewPendingSubscription() throws Exception {
-
-        when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
-        withExpectedSubscription(empty(), MOBILE);
-        LocalDate date = LocalDate.now();
-        ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);
-
-        PendingSubscriptionServiceResponse pendingSubscriptionResponse = this.subscriptionService.handlePendingSubscriptionCreation(
-                TEST_VRM, MOBILE, date, new MotIdentification(TEST_MOT_TEST_NUMBER, TEST_DVLA_ID), CONTACT_TYPE_MOBILE);
-
-        verifyZeroInteractions(notifyService);
-        verify(pendingSubscriptionRepository, times(1)).save(pendingSubscriptionArgumentCaptor.capture());
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getMotDueDate(), date);
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getContact(), MOBILE);
-        assertEquals(pendingSubscriptionArgumentCaptor.getValue().getVrm(), TEST_VRM);
-        assertNotNull(pendingSubscriptionResponse.getConfirmationId());
-        assertNull(pendingSubscriptionResponse.getRedirectUri());
-    }
-
-    private void withExpectedSubscription(Optional<Subscription> subscription, String contact) {
-        when(subscriptionRepository.findByVrmAndEmail(TEST_VRM, contact)).thenReturn(subscription);
     }
 }

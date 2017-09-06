@@ -77,14 +77,13 @@ public class PendingSubscriptionServiceTest {
     }
 
     @Test
-    public void saveSubscriptionEmailCallsDbToSaveDetailsAndSendsNotification() throws Exception {
+    public void createPendingSubscriptionWithEmailCallsDbToSaveDetailsAndSendsNotification() throws Exception {
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMake("TEST-MAKE");
         vehicleDetails.setModel("TEST-MODEL");
         when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty(), EMAIL);
-        when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(empty());
         doNothing().when(notifyService).sendEmailAddressConfirmationEmail(EMAIL, CONFIRMATION_LINK, "TEST-MAKE TEST-MODEL, ");
         LocalDate date = LocalDate.now();
 
@@ -100,14 +99,13 @@ public class PendingSubscriptionServiceTest {
     }
 
     @Test
-    public void saveSubscriptionMobileCallsDbToSaveDetailsButDoesNotSendNotification() throws Exception {
+    public void createPendingSubscriptionWithMobileCallsDbToSaveDetailsAndDoesNotSendNotification() throws Exception {
         VehicleDetails vehicleDetails = new VehicleDetails();
         vehicleDetails.setMake("TEST-MAKE");
         vehicleDetails.setModel("TEST-MODEL");
         when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(vehicleDetails));
 
         withExpectedSubscription(empty(), MOBILE);
-        when(pendingSubscriptionRepository.findByConfirmationId(CONFIRMATION_ID)).thenReturn(empty());
         LocalDate date = LocalDate.now();
 
         this.subscriptionService.createPendingSubscription(TEST_VRM, MOBILE, date, CONFIRMATION_ID,
