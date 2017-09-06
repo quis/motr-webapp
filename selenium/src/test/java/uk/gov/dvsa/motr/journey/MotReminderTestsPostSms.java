@@ -22,7 +22,7 @@ import static org.testng.Assert.assertTrue;
 
 public class MotReminderTestsPostSms extends BaseTest {
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Owner of a vehicle with a mot is able to set up a MOT reminder with their VRM and email and unsubscribe from it",
             groups = {"PostSms"})
     public void createMotReminderForMyVehicleThenUnsubscribe(String vrm, String email) throws IOException, InterruptedException {
@@ -43,7 +43,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertTrue(unsubscribeConfirmed.isSurveyLinkDisplayed());
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "After confirming the reminder the user can click the link to go back to the start page",
             groups = {"PostSms"})
     public void afterConfirmationOfReminderUserCanGoToStartPageToSignUpAgain(String vrm, String email) throws Exception {
@@ -58,7 +58,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         HomePage homePage = confirmationPage.clickSignUpForAnotherReminder();
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Reminder subscriber with an active subscription creates another subscription with the same VRM and email" +
                     " does not need to confirm their email again",
             groups = {"PostSms"})
@@ -73,7 +73,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         motReminder.enterAndConfirmPendingReminderDetailsSecondTimePostSms(vrm, email);
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "Reminder subscriber with multiple pending subscriptions is directed to the confirm email error page when " +
                     "selecting an old confirm email link",
             groups = {"PostSms"})
@@ -97,7 +97,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         motReminder.navigateToEmailConfirmationPage(newConfirmationId);
     }
 
-    @Test(dataProvider = "dataProviderCreateMotReminderForMyVehicle",
+    @Test(dataProvider = "dataProviderCreateEmailMotReminderForMyVehicle",
             description = "A user who has previously unsubscribed from reminders will be displayed the unsubscribe error page",
             groups = {"PostSms"})
     public void reminderThatHasBeenUnsubscribedDisplaysErrorPage(String vrm, String email) {
@@ -128,7 +128,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         ReviewPage reviewPageSubmit = emailPageFromReview.enterEmailAddress(RandomGenerator.generateEmail());
 
         //Then my mot reminder is set up successfully with the updated email address
-        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
+        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetailsOnEmailChannel();
         assertEquals(confirmPage.getTitle(), "One more step");
     }
 
@@ -145,7 +145,7 @@ public class MotReminderTestsPostSms extends BaseTest {
         ReviewPage reviewPageSubmit = vrmPageFromReview.enterVrmExpectingReturnToReview(RandomGenerator.generateVrm());
 
         //Then my mot reminder is set up successfully with the updated vehicle vrm
-        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetails();
+        EmailConfirmationPendingPage confirmPage = reviewPageSubmit.confirmSubscriptionDetailsOnEmailChannel();
         assertEquals(confirmPage.getTitle(), "One more step");
     }
 
@@ -162,9 +162,26 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
-    @DataProvider(name = "dataProviderCreateMotReminderForMyVehicle")
-    public Object[][] dataProviderCreateMotReminderForMyVehicle() throws IOException {
+    @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
+            groups = {"PostSms"})
+    public void createMotReminderForMyVehicleUsingMobile(String vrm, String mobileNumber) {
+
+        //Given I am a vehicle owner on the MOTR start page
+        //When I enter the vehicle vrm and my mobile number
+        //Then I can confirm my mobile number via the sent code
+        motReminder.subscribeToReminderAndConfirmMobileNumber(vrm, mobileNumber);
+    }
+
+
+    @DataProvider(name = "dataProviderCreateEmailMotReminderForMyVehicle")
+    public Object[][] dataProviderCreateEmailMotReminderForMyVehicle() throws IOException {
 
         return new Object[][]{{RandomGenerator.generateVrm(), RandomGenerator.generateEmail()}};
+    }
+
+    @DataProvider(name = "dataProviderCreateSmsMotReminderForMyVehicle")
+    public Object[][] dataProviderCreateSmsMotReminderForMyVehicle() throws IOException {
+
+        return new Object[][]{{RandomGenerator.generateVrm(), RandomGenerator.generateMobileNumber()}};
     }
 }

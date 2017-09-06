@@ -6,6 +6,8 @@ import uk.gov.dvsa.motr.ui.page.CookiesPage;
 import uk.gov.dvsa.motr.ui.page.EmailConfirmationPendingPage;
 import uk.gov.dvsa.motr.ui.page.EmailPage;
 import uk.gov.dvsa.motr.ui.page.HomePage;
+import uk.gov.dvsa.motr.ui.page.PhoneConfirmPage;
+import uk.gov.dvsa.motr.ui.page.PhoneNumberEntryPage;
 import uk.gov.dvsa.motr.ui.page.PrivacyPage;
 import uk.gov.dvsa.motr.ui.page.ReviewPage;
 import uk.gov.dvsa.motr.ui.page.SubscriptionConfirmationErrorPage;
@@ -19,6 +21,7 @@ import uk.gov.dvsa.motr.ui.page.VrmPage;
 public class MotReminder {
 
     public DynamoDbSubscriptionHelper subscriptionDb = new DynamoDbSubscriptionHelper();
+    public DynamoDbSmsConfirmationHelper smsConfirmationHelper = new DynamoDbSmsConfirmationHelper();
 
     public ReviewPage enterReminderDetails(String vrm, String email) {
         HomePage page = PageNavigator.goTo(HomePage.class);
@@ -33,6 +36,16 @@ public class MotReminder {
         ChannelSelectionPage channelSelectionPage = vrmPage.enterVrmSmsToggleOn(vrm);
         EmailPage emailPage = channelSelectionPage.selectEmailChannel();
         return emailPage.enterEmailAddress(email);
+    }
+
+    public SubscriptionConfirmationPage enterReminderDetailsUsingMobileChannel(String vrm, String mobileNumber) {
+        HomePage page = PageNavigator.goTo(HomePage.class);
+        VrmPage vrmPage = page.clickStartNow();
+        ChannelSelectionPage channelSelectionPage = vrmPage.enterVrmSmsToggleOn(vrm);
+        PhoneNumberEntryPage phoneNumberEntryPage = channelSelectionPage.selectPhoneChannel();
+        ReviewPage reviewPage = phoneNumberEntryPage.enterPhoneNumber(mobileNumber);
+        PhoneConfirmPage phoneConfirmPage = reviewPage.confirmSubscriptionDetailsOnMobileChannel();
+        return phoneConfirmPage.enterConfirmationCode(smsConfirmationHelper.findSmsConfirmCodeFromVrmAndMobileNumber(vrm, mobileNumber));
     }
 
     public CookiesPage clickCookiesLink() {
@@ -72,12 +85,18 @@ public class MotReminder {
 
     public EmailConfirmationPendingPage enterAndConfirmPendingReminderDetails(String vrm, String email) {
 
-        return enterReminderDetails(vrm, email).confirmSubscriptionDetails();
+        return enterReminderDetails(vrm, email).confirmSubscriptionDetailsOnEmailChannel();
     }
 
     public EmailConfirmationPendingPage enterAndConfirmPendingReminderDetailsPostSms(String vrm, String email) {
 
-        return enterReminderDetailsSmsToggleOn(vrm, email).confirmSubscriptionDetails();
+        return enterReminderDetailsSmsToggleOn(vrm, email).confirmSubscriptionDetailsOnEmailChannel();
+    }
+
+
+    public SubscriptionConfirmationPage subscribeToReminderAndConfirmMobileNumber(String vrm, String mobileNumber) {
+
+        return enterReminderDetailsUsingMobileChannel(vrm, mobileNumber);
     }
 
     public SubscriptionConfirmationPage enterAndConfirmPendingReminderDetailsSecondTime(String vrm, String email) {
@@ -100,6 +119,7 @@ public class MotReminder {
         String confirmationId = subscriptionDb.findConfirmationIdByVrmAndEmail(vrm, email);
         return navigateToEmailConfirmationPage(confirmationId);
     }
+
 
     public SubscriptionConfirmationPage navigateToEmailConfirmationPage(String confirmationId) {
 

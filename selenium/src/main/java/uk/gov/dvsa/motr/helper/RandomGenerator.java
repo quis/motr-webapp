@@ -22,4 +22,9 @@ public class RandomGenerator {
         return "DVLA-ID-" + RandomStringUtils.randomAlphabetic(5).toUpperCase();
     }
 
+    public static String generateMobileNumber() {
+
+        return "07" + RandomStringUtils.randomNumeric(9);
+    }
+
 }

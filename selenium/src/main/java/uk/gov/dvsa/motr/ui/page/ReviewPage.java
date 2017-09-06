@@ -25,10 +25,16 @@ public class ReviewPage extends Page {
         return "Check your details – MOT reminders";
     }
 
-    public EmailConfirmationPendingPage confirmSubscriptionDetails() {
+    public EmailConfirmationPendingPage confirmSubscriptionDetailsOnEmailChannel() {
 
         continueButton.click();
         return new EmailConfirmationPendingPage();
+    }
+
+    public PhoneConfirmPage confirmSubscriptionDetailsOnMobileChannel() {
+
+        continueButton.click();
+        return new PhoneConfirmPage();
     }
 
     public SubscriptionConfirmationPage confirmSubscriptionDetailsNthTime() {
