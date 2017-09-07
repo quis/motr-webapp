@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class VrmValidator {
 
-    public static final String REGISTRATION_EMPTY_MESSAGE = "Enter the vehicle's registration";
+    public static final String REGISTRATION_EMPTY_MESSAGE = "<a href=\"#regNumber\">Enter the vehicle's registration</a>";
     public static final String REGISTRATION_TOO_LONG_MESSAGE = "Registration must be shorter than 14 characters";
     public static final String REGISTRATION_CAN_ONLY_CONTAIN_LETTERS_NUMBERS_AND_HYPHENS_MESSAGE = "Registration can only contain " +
             "letters, numbers and hyphens";

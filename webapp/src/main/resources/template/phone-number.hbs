@@ -6,8 +6,6 @@
 
             <a href="{{back_url}}" class="link-back">{{back_button_text}}</a>
 
-            <h1 class="heading-xlarge">What is your mobile number?</h1>
-
             {{#message}}
                 {{> partial/error-message }}
             {{/message}}
@@ -16,13 +14,15 @@
                 {{> partial/system-error }}
             {{/showSystemError}}
 
+            <h1 class="heading-xlarge">What is your mobile number?</h1>
+
             <form method="POST" autocomplete="off" novalidate="">
 
                 <div class="form-group {{#message}}form-group-error{{/message}}">
                     <label for="phoneNumber" class="form-label">
                         Mobile phone number
-                        {{#messageAtField}}<span class="error-message">{{ messageAtField }}</span>{{/messageAtField}}
                         <span class="form-hint">Your reminder will be sent here</span>
+                        {{#messageAtField}}<span class="error-message">{{ messageAtField }}</span>{{/messageAtField}}
                     </label>
 
                     <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="{{phoneNumber}}">
