@@ -12,7 +12,7 @@ public class PhoneNumberValidator {
     private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
     private static final String INVALID_PHONE_NUMBER_MESSAGE = "Enter a valid UK mobile number";
     private static final String TOO_MANY_SUBSCRIPTIONS = "You can’t subscribe right now. You have already subscribed to two" +
-            "MOT reminders at this phone number";
+            " MOT reminders at this phone number";
 
     private String message;
 
