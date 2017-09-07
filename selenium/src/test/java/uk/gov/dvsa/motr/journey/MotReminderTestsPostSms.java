@@ -166,7 +166,8 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
-    @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
+    @Test(description = "Owner of a vehicle with a mot is able to set up a MOT reminder with their VRM and mobile number",
+            dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
             groups = {"PostSms"})
     public void createSMSMotReminderForMyVehicleUsingMobile(String vrm, String mobileNumber) {
 
@@ -180,7 +181,8 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
-    @Test(groups = {"PostSms"})
+    @Test(description = "Owner of a new vehicle with a mot is able to set up a MOT reminder with their VRM and mobile number",
+            groups = {"PostSms"})
     public void canCreateSMSReminderWhenVehicleDoesNotHaveAnMotYet() {
 
         //Given I am an owner of a new vehicle
@@ -194,7 +196,8 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
-    @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
+    @Test(description = "Owner of a vehicle with a mot can change their mobile number when creating MOT reminder",
+            dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
             groups = {"PostSms"})
     public void canChangeMobileNumberFromReviewWhenCreatingReminder(String vrm, String mobileNumber) {
 
@@ -216,7 +219,9 @@ public class MotReminderTestsPostSms extends BaseTest {
         assertEquals(subscriptionConfirmationPage.getHeaderTitle(), "You've signed up for an MOT reminder");
     }
 
-    @Test(dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
+    @Test(description = "Reminder subscriber with one active SMS subscription creates another subscription with the same VRM and " +
+            "mobile number does not need to confirm their number again",
+            dataProvider = "dataProviderCreateSmsMotReminderForMyVehicle",
             groups = {"PostSms"})
     public void createDuplicateMOTSMSReminderDoesNotNeedToConfirmMobileNumberAgain(String vrm, String mobileNumber) {
 
