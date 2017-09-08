@@ -5,7 +5,7 @@
         <div class="column-two-thirds">
 
             <h1 class="heading-xlarge">One more step</h1>
-
+            
             <p>We sent you a text message with a 6-digit code. Enter the code below to activate your reminder.</p>
 
             {{#message}}
@@ -18,28 +18,33 @@
 
             <form method="POST" autocomplete="off" novalidate="">
 
-                <div class="form-group {{#message}}form-group-error{{/message}}">
-                    <label for="code" class="form-label">
-                        Code from text message
-                        {{#messageAtField}}<span class="error-message">{{ messageAtField }}</span>{{/messageAtField}}
-                    </label>
+                {{#if showCodeEntry}}
+                    <div class="form-group {{#message}}form-group-error{{/message}}">
+                        <label for="code" class="form-label">
+                            Code from text message
+                            {{#messageAtField}}<span class="error-message">{{ messageAtField }}</span>{{/messageAtField}}
+                        </label>
 
-                    <input type="text" id="confirmationCode" name="confirmationCode" class="form-control" maxlength="6" value="{{confirmationCode}}">
+                        <input type="text" id="confirmationCode" name="confirmationCode" class="form-control" maxlength="6" value="{{confirmationCode}}">
+                    </div>
+                {{/if}}
 
-                </div>
+                {{#if resendAllowed}}
+                    <div class="form-group">
+                        <details role="group">
+                            <summary role="button" aria-controls="details-content-0" aria-expanded="false"><span class="summary">Text didn’t arrive?</span></summary>
+                            <div id="details-content-0" aria-hidden="true">
+                                We sent you a text message to {{viewModel.phoneNumber}}. It can take a couple of minutes for the text to arrive. <a href="{{url this resendUrl}}">Resend the text</a>.
+                            </div>
+                        </details>
+                    </div>
+                {{/if}}
 
-                <div class="form-group">
-                    <details role="group">
-                        <summary role="button" aria-controls="details-content-0" aria-expanded="false"><span class="summary">Text didn’t arrive?</span></summary>
-                        <div id="details-content-0" aria-hidden="true">
-                            We sent you a text message to {{viewModel.phoneNumber}}. It can take a couple of minutes for the text to arrive. <a href="{{url this resendUrl}}">Resend the text</a>.
-                        </div>
-                    </details>
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="{{continue_button_text}}" class="button" id="continue">
-                </div>
+                {{#if showCodeEntry}}
+                    <div class="form-group">
+                        <input type="submit" value="{{continue_button_text}}" class="button" id="continue">
+                    </div>
+                {{/if}}
 
             </form>
 

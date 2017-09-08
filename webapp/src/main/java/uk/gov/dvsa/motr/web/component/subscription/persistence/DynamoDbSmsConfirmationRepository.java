@@ -66,7 +66,7 @@ public class DynamoDbSmsConfirmationRepository implements SmsConfirmationReposit
     }
 
     @Override
-    public void save(SmsConfirmation smsConfirmation) {
+    public void save(SmsConfirmation smsConfirmation, boolean updateResendTime) {
 
         Item item = new Item()
                 .withString("id", smsConfirmation.getConfirmationId())
@@ -75,8 +75,15 @@ public class DynamoDbSmsConfirmationRepository implements SmsConfirmationReposit
                 .withString("code", smsConfirmation.getCode())
                 .withInt("attempts", smsConfirmation.getAttempts())
                 .withInt("resend_attempts", smsConfirmation.getResendAttempts())
-                .withString("latest_resend_attempt", ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .withNumber("deletion_date", ZonedDateTime.now().plusMonths(MONTHS_TO_DELETION).toEpochSecond());
+
+        if (updateResendTime) {
+            item.withString("latest_resend_attempt",
+                    ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        } else {
+            item.withString("latest_resend_attempt",
+                    smsConfirmation.getLatestResendAttempt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
 
         dynamoDb.getTable(tableName).putItem(item);
     }
