@@ -1,8 +1,9 @@
 package uk.gov.dvsa.motr.web.resource;
 
 import uk.gov.dvsa.motr.web.analytics.DataLayerHelper;
+import uk.gov.dvsa.motr.web.component.subscription.helper.UrlHelper;
 import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService;
-import uk.gov.dvsa.motr.web.component.subscription.service.SubscriptionConfirmationService;
+import uk.gov.dvsa.motr.web.component.subscription.service.SmsConfirmationService.Confirmation;
 import uk.gov.dvsa.motr.web.cookie.MotrSession;
 import uk.gov.dvsa.motr.web.render.TemplateEngine;
 import uk.gov.dvsa.motr.web.validator.SmsConfirmationCodeValidator;
@@ -39,17 +40,20 @@ public class SmsConfirmationCodeResource {
 
     private DataLayerHelper dataLayerHelper;
     private SmsConfirmationService smsConfirmationService;
+    private UrlHelper urlHelper;
 
     @Inject
     public SmsConfirmationCodeResource(
             MotrSession motrSession,
             TemplateEngine renderer,
-            SmsConfirmationService smsConfirmationService
+            SmsConfirmationService smsConfirmationService,
+            UrlHelper urlHelper
     ) {
         this.motrSession = motrSession;
         this.renderer = renderer;
         this.dataLayerHelper = new DataLayerHelper();
         this.smsConfirmationService = smsConfirmationService;
+        this.urlHelper = urlHelper;
     }
 
     @GET
@@ -64,6 +68,7 @@ public class SmsConfirmationCodeResource {
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
         modelMap.put("viewModel", viewModel);
+        modelMap.put("showCodeEntry", true);
 
         return Response.ok(renderer.render(SMS_CONFIRMATION_CODE_TEMPLATE, modelMap)).build();
     }
@@ -72,25 +77,52 @@ public class SmsConfirmationCodeResource {
     public Response smsConfirmationCodePagePost(@FormParam("confirmationCode") String confirmationCode) throws Exception {
 
         Validator validator = new SmsConfirmationCodeValidator();
+        boolean resendAllowed = true;
+        boolean showCodeEntry = true;
 
+        //this block is for when the entered code passes simple front end validation
         if (validator.isValid(confirmationCode)) {
 
-            String phoneNumber = motrSession.getPhoneNumberFromSession();
-            String vrm = motrSession.getVrmFromSession();
             String confirmationId = motrSession.getConfirmationIdFromSession();
+            Confirmation codeValid = smsConfirmationService.verifySmsConfirmationCode(
+                    motrSession.getVrmFromSession(),
+                    motrSession.getPhoneNumberFromSession(),
+                    confirmationId,
+                    confirmationCode);
 
-            String redirectUri = smsConfirmationService.verifySmsConfirmation(vrm, phoneNumber, confirmationId, confirmationCode);
-
-            if (!redirectUri.equals("")) {
-                return redirect(redirectUri);
+            switch (codeValid) {
+                case CODE_NOT_VALID_MAX_ATTEMPTS_REACHED_RESEND_NOT_ALLOWED_TIME_LIMITED:
+                    validator.setMessage(SmsConfirmationCodeValidator.CODE_INCORRECT_3_TIMES_CANNOT_GET_NEW_CODE);
+                    validator.setMessageAtField(SmsConfirmationCodeValidator.CODE_INCORRECT_3_TIMES_CANNOT_GET_NEW_CODE_AT_FIELD);
+                    resendAllowed = false;
+                    showCodeEntry = false;
+                    break;
+                case CODE_NOT_VALID_MAX_ATTEMPTS_REACHED_RESEND_ALLOWED:
+                    validator.setMessage(SmsConfirmationCodeValidator.CODE_INCORRECT_3_TIMES_CAN_GET_NEW_CODE);
+                    validator.setMessageAtField(SmsConfirmationCodeValidator.CODE_INCORRECT_3_TIMES_CAN_GET_NEW_CODE_AT_FIELD);
+                    resendAllowed = true;
+                    showCodeEntry = false;
+                    break;
+                case CODE_NOT_VALID_RESEND_ALLOWED:
+                    validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);
+                    validator.setMessageAtField(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD);
+                    resendAllowed = true;
+                    showCodeEntry = true;
+                    break;
+                case CODE_NOT_VALID_RESEND_NOT_ALLOWED_TIME_LIMITED:
+                    validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);
+                    validator.setMessageAtField(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD);
+                    resendAllowed = false;
+                    showCodeEntry = true;
+                    break;
+                case CODE_VALID:
+                    return redirect(urlHelper.confirmSubscriptionLink(confirmationId));
+                default:
+                    break;
             }
-
-            validator.setMessage(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE);
-            validator.setMessageAtField(SmsConfirmationCodeValidator.INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD);
         }
 
         Map<String, Object> modelMap = new HashMap<>();
-
         modelMap.put(MESSAGE_MODEL_KEY, validator.getMessage());
         modelMap.put(MESSAGE_AT_FIELD_MODEL_KEY, validator.getMessageAtField());
         dataLayerHelper.putAttribute(ERROR_KEY, validator.getMessage());
@@ -98,6 +130,8 @@ public class SmsConfirmationCodeResource {
         modelMap.put(CONFIRMATION_CODE_MODEL_KEY, confirmationCode);
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
+        modelMap.put("resendAllowed", resendAllowed);
+        modelMap.put("showCodeEntry", showCodeEntry);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 

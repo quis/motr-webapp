@@ -12,6 +12,20 @@ public class SmsConfirmationCodeValidator implements Validator {
             "<br/>Enter 6 digits you received in text message";
     public static final String INVALID_CONFIRMATION_CODE_MESSAGE_AT_FIELD = "Enter 6 digits from text message";
 
+    public static final String CODE_INCORRECT_3_TIMES_CAN_GET_NEW_CODE = "Code was entered incorrectly 3 times. <br/>" +
+            "<br/>You can request a new code. ";
+    public static final String CODE_INCORRECT_3_TIMES_CAN_GET_NEW_CODE_AT_FIELD = "???";
+
+    public static final String CODE_INCORRECT_3_TIMES_CANNOT_GET_NEW_CODE = "You can’t subscribe now.<br/>" +
+            "<br/>Code was entered incorrectly 3 times.<br/>" +
+            "<br/>Come back later and try to subscribe again.";
+    public static final String CODE_INCORRECT_3_TIMES_CANNOT_GET_NEW_CODE_AT_FIELD = "???";
+
+    public static final String RESEND_LIMIT_REACHED = "Activation code was already resent.<br/>" +
+            "<br/>It can take several minutes to arrive.<br/>" +
+            "<br/>If you didn’t receive the code, come back later and try to subscribe again ";
+    public static final String RESEND_LIMIT_REACHED_AT_FIELD = "???";
+
     private String message;
     private String messageAtField;
 

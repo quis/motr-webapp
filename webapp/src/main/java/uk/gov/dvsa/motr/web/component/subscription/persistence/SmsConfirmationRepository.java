@@ -8,5 +8,5 @@ public interface SmsConfirmationRepository {
 
     Optional<SmsConfirmation> findByConfirmationId(String id);
 
-    void save(SmsConfirmation smsConfirmation);
+    void save(SmsConfirmation smsConfirmation, boolean updateResendTime);
 }
