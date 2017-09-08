@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 public class PhoneNumberResourceTest {
 
     private static final String PHONE_NUMBER = "07801856718";
+    private static final String PHONE_NUMBER_INVALID = "0780185671";
 
     private MotrSession motrSession;
     private TemplateEngineStub engine;
@@ -49,5 +50,15 @@ public class PhoneNumberResourceTest {
         Response response = resource.phoneNumberPagePost(PHONE_NUMBER);
 
         assertEquals(302, response.getStatus());
+    }
+
+    @Test
+    public void onPostWithInValid_ThenNotRedirectedToReviewPage() throws Exception {
+
+        when(validator.isValid(PHONE_NUMBER_INVALID)).thenReturn(false);
+        Response response = resource.phoneNumberPagePost(PHONE_NUMBER_INVALID);
+
+        assertEquals(200, response.getStatus());
+        assertEquals("phone-number", engine.getTemplate());
     }
 }
