@@ -12,4 +12,6 @@ public interface PendingSubscriptionRepository {
     void save(PendingSubscription subscription);
 
     void delete(PendingSubscription pendingSubscription);
+
+    public Optional<PendingSubscription> findByVrmAndContactDetails(String vrm, String contactDetails);
 }

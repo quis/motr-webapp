@@ -122,6 +122,7 @@ public class PendingSubscriptionServiceTest {
     @Test
     public void handleSubscriptionWillCreateNewPendingSubscription() throws Exception {
         when(client.fetch(eq(TEST_VRM))).thenReturn(Optional.of(new VehicleDetails()));
+        when(pendingSubscriptionRepository.findByVrmAndContactDetails(TEST_VRM, EMAIL)).thenReturn(Optional.empty());
         withExpectedSubscription(empty());
         LocalDate date = LocalDate.now();
         ArgumentCaptor<PendingSubscription> pendingSubscriptionArgumentCaptor = ArgumentCaptor.forClass(PendingSubscription.class);

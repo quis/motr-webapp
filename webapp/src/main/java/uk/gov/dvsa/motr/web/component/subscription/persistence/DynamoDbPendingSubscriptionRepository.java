@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 
@@ -59,6 +60,27 @@ public class DynamoDbPendingSubscriptionRepository implements PendingSubscriptio
 
         ItemCollection<QueryOutcome> items = table.query(query);
 
+        Iterator<Item> resultIterator = items.iterator();
+
+        if (!resultIterator.hasNext()) {
+            return Optional.empty();
+        }
+
+        Item item = resultIterator.next();
+
+        return Optional.of(mapItemToPendingSubscription(item));
+    }
+
+    @Override
+    public Optional<PendingSubscription> findByVrmAndContactDetails(String vrm, String contactDetails) {
+
+        QuerySpec query = new QuerySpec()
+                .withKeyConditionExpression("vrm = :vrm AND email = :contact")
+                .withValueMap(new ValueMap().withString(":vrm", vrm).withString(":contact", contactDetails));
+
+        Table table = dynamoDb.getTable(tableName);
+
+        ItemCollection<QueryOutcome> items = table.query(query);
         Iterator<Item> resultIterator = items.iterator();
 
         if (!resultIterator.hasNext()) {

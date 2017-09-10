@@ -62,8 +62,14 @@ public class PendingSubscriptionService {
 
             return pendingSubscriptionResponse.setRedirectUri(redirectUri);
         } else {
-            String confimrationId = generateId();
-            createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
+            String confimrationId;
+            Optional<PendingSubscription> pendingSubscription = pendingSubscriptionRepository.findByVrmAndContactDetails(vrm, email);
+            if (pendingSubscription.isPresent()) {
+                confimrationId = pendingSubscription.get().getConfirmationId();
+            } else {
+                confimrationId = generateId();
+                createPendingSubscription(vrm, email, motDueDate, confimrationId, motIdentification, contactType);
+            }
 
             return contactType == Subscription.ContactType.EMAIL
                     ? pendingSubscriptionResponse.setRedirectUri(urlHelper.emailConfirmationPendingLink())

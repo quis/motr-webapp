@@ -14,6 +14,7 @@ import uk.gov.dvsa.motr.web.eventlog.subscription.SmsConfirmationCreatedEvent;
 import uk.gov.dvsa.motr.web.eventlog.subscription.SmsConfrimationCreationFailedEvent;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -56,7 +57,11 @@ public class SmsConfirmationService {
 
     public String handleSmsConfirmationCreation(String vrm, String phoneNumber, String confirmationId) {
 
-        createSmsConfirmation(vrm, phoneNumber, generateCode(), confirmationId);
+        //if not already exists
+        Optional<SmsConfirmation> smsConfirmation = smsConfirmationRepository.findByConfirmationId(confirmationId);
+        if (!smsConfirmation.isPresent()) {
+            createSmsConfirmation(vrm, phoneNumber, generateCode(), confirmationId);
+        }
 
         return urlHelper.phoneConfirmationLink();
     }
