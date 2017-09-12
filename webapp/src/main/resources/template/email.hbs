@@ -6,19 +6,19 @@
 
             <a href="{{back_url}}" class="link-back">{{back_button_text}}</a>
 
-            <h1 class="heading-xlarge">What is your email address?</h1>
-
             {{#message}}
                 {{> partial/error-message }}
             {{/message}}
+
+            <h1 class="heading-xlarge">What is your email address?</h1>
 
             <form action="" method="POST" autocomplete="off" novalidate="">
 
                 <div class="form-group {{#message}}form-group-error{{/message}}">
                     <label for="emailAddress" class="form-label">
                         Email address
-                        {{#message}}<span class="error-message">{{ message }}</span>{{/message}}
                         <span class="form-hint">Your reminder will be sent here</span>
+                        {{#message}}<span class="error-message">{{ message }}</span>{{/message}}
                     </label>
 
                     <input type="email" name="emailAddress" id="emailAddress" class="form-control" value="{{email}}">

@@ -10,78 +10,92 @@
 
             <h2 class="heading-medium">Vehicle details</h2>
 
-            <dl class="govuk-check-your-answers cya-questions-short cya-questions-short--switch-bold">
-                <div>
-                    <dt class="cya-question">Registration number</dt>
-                    <dd class="cya-answer">{{viewModel.registration}}</dd>
-                    <dd class="cya-change"><a id="change-registration-link" href="{{url this "/vrm"}}">Change<span class="visuallyhidden"> vehicle registration</span></a></dd>
-                </div>
-                <div>
-                    <dt class="cya-question">Make</dt>
-                    <dd class="cya-answer">{{viewModel.make}}</dd>
-                    <dd class="cya-change">&nbsp;</dd>
-                </div>
-                <div>
-                    <dt class="cya-question">Model</dt>
-                    <dd class="cya-answer">{{viewModel.model}}</dd>
-                    <dd class="cya-change">&nbsp;</dd>
-                </div>
-                <div>
-                    <dt class="cya-question">Colour</dt>
-                    <dd class="cya-answer">{{viewModel.colour}}</dd>
-                    <dd class="cya-change">&nbsp;</dd>
-                </div>
-                <div>
-                    <dt class="cya-question">Year of manufacture</dt>
-                    <dd class="cya-answer">{{viewModel.yearOfManufacture}}</dd>
-                    <dd class="cya-change">&nbsp;</dd>
-                </div>
+            <table class="key-value-list">
 
-                <div>
-                    {{#if isDvlaVehicle}}
-                        <dt class="cya-question">MOT due date</dt>
-                    {{else}}
-                        <dt class="cya-question">MOT expiry date</dt>
-                    {{/if}}
-                    <dd class="cya-answer">{{viewModel.expiryDate}}</dd>
-                    <dd class="cya-change">&nbsp;</dd>
-                </div>
-            </dl>
+                <tbody>
+
+                    <tr>
+                        <th class="key-value-list__key">Registration number</th>
+                        <td class="key-value-list__value">{{viewModel.registration}}</td>
+                        <td class="key-value-list__item-action"><a id="change-registration-link" href="{{url this "/vrm"}}">Change<span class="visuallyhidden"> vehicle registration</span></a></td>
+                    </tr>
+
+                    <tr>
+                        <th class="key-value-list__key">Make</th>
+                        <td class="key-value-list__value" colspan="2">{{viewModel.make}}</td>
+                    </tr>
+
+                    <tr>
+                        <th class="key-value-list__key">Model</th>
+                        <td class="key-value-list__value" colspan="2">{{viewModel.model}}</td>
+                    </tr>
+
+                    <tr>
+                        <th class="key-value-list__key">Colour</th>
+                        <td class="key-value-list__value" colspan="2">{{viewModel.colour}}</td>
+                    </tr>
+
+                    <tr>
+                        <th class="key-value-list__key">Year of manufacture</th>
+                        <td class="key-value-list__value" colspan="2">{{viewModel.yearOfManufacture}}</td>
+                    </tr>
+
+                    <tr>
+                        <th class="key-value-list__key">MOT expiry date</th>
+                        <td class="key-value-list__value" colspan="2">{{viewModel.expiryDate}}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
 
         </div>
+
     </div>
 
-     <div class="grid-row">
+    <div class="grid-row">
+
         <div class="column-two-thirds">
 
             <details>
-                <summary role="button"><span class="summary">Incorrect vehicle details?</span></summary>
+                <summary role="button">
+                    <span class="summary">Incorrect vehicle details?</span>
+                </summary>
                 <div class="panel panel-border-narrow">
-                <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa/y/mot-vehicle-tests-and-approval" target="_blank">contact DVSA</a></p>
+                    <p>If you think any of the vehicle details are wrong, <a href="https://www.gov.uk/contact-dvsa/y/mot-vehicle-tests-and-approval" target="_blank">contact DVSA</a></p>
                 </div>
             </details>
 
         </div>
-     </div>
 
-     <div class="grid-row u-space-b30">
+    </div>
+
+    <div class="grid-row u-space-b30">
+
         <div class="column-two-thirds">
 
             <h2 class="heading-medium">Your details</h2>
 
-            <dl class="govuk-check-your-answers cya-questions-short cya-questions-short--switch-bold">
-                <div>
-                    <dt class="cya-question">{{viewModel.contactType}}</dt>
-                    <dd class="cya-answer">{{viewModel.contact}}</dd>
-                    <dd class="cya-change"><a id={{changeContactId}} href={{url this changeContactUrl}}>Change<span class="visuallyhidden"> {{viewModel.contactType}}</span></a></dd>
-                </div>
-            </dl>
+            <table class="key-value-list">
 
+                <tbody>
+
+                    <tr>
+                        <th class="key-value-list__key">{{viewModel.contactType}}</th>
+                        <td class="key-value-list__value">{{viewModel.contact}}</td>
+                        <td class="key-value-list__item-action"><a id={{changeContactId}} href={{url this changeContactUrl}}>Change <span class="visuallyhidden">{{viewModel.contactType}}</span></a></td>
+                    </tr>
+
+                </tbody>
+
+            </table>
 
         </div>
-     </div>
 
-     <div class="grid-row">
+    </div>
+
+    <div class="grid-row">
+
         <div class="column-two-thirds">
 
             <form method="POST">
@@ -91,6 +105,8 @@
             </form>
 
         </div>
-     </div>
+
+    </div>
+
 {{/partial}}
 {{> master pageTitle="Check your details – MOT reminders"}}

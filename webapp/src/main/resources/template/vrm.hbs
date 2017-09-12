@@ -6,8 +6,6 @@
 
             <a href="{{{url this back_url}}}" class="link-back">{{back_button_text}}</a>
 
-            <h1 class="heading-xlarge">What is the vehicle's registration number?</h1>
-
             {{#message}}
                 {{> partial/error-message }}
             {{/message}}
@@ -16,17 +14,23 @@
                 {{> partial/system-error }}
             {{/showSystemError}}
 
+            <h1 class="heading-xlarge">What is the vehicle's registration number?</h1>
+
             <form method="POST" autocomplete="off" novalidate="">
 
                 <div class="form-group {{#message}}form-group-error{{/message}}">
                     <label for="regNumber" class="form-label">
                         Registration number (number plate)
-                        {{#showInLine}}<span class="error-message">{{ message }}</span>{{/showInLine}}
                         <span class="form-hint">For example, CU57ABC</span>
+                        {{#showInLine}}<span class="error-message">{{ message }}</span>{{/showInLine}}
                     </label>
 
                     <input class="form-control" id="regNumber" name="regNumber" type="text" style="text-transform: uppercase;" value="{{vrm}}">
+
+                    <label for="honey" class="visuallyhidden">Leave this blank</label>
+
                     <input class="visuallyhidden" tabindex="-1" id="honey" name="honey" title="This field should be left blank" type="text" value="">
+
                 </div>
 
                 <div class="form-group">
