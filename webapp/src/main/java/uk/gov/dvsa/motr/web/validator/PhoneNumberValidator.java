@@ -10,7 +10,9 @@ import javax.inject.Inject;
 public class PhoneNumberValidator {
 
     private static final String EMPTY_PHONE_NUMBER_MESSAGE = "Enter your mobile number";
-    private static final String INVALID_PHONE_NUMBER_MESSAGE = "Enter a valid UK mobile number";
+    private static final String INVALID_PHONE_NUMBER_MESSAGE_HEADING = "The number you entered is not a UK mobile phone" +
+            "number";
+    private static final String INVALID_PHONE_NUMBER_MESSAGE_FIELD = "Enter a valid UK mobile phone number";
     private static final String TOO_MANY_SUBSCRIPTIONS = "You can’t subscribe right now. You have already subscribed to two" +
             " MOT reminders for this phone number <br/>" +
             "<br/> You may unsubscribe from one of the reminders or use a different mobile phone number.";
@@ -31,7 +33,7 @@ public class PhoneNumberValidator {
 
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             message = EMPTY_PHONE_NUMBER_MESSAGE;
-            messageAtField = "";
+            messageAtField = EMPTY_PHONE_NUMBER_MESSAGE;
 
             return false;
         }
@@ -55,12 +57,7 @@ public class PhoneNumberValidator {
 
         return messageAtField;
     }
-
-    public void setMessageAtField(String messageAtField) {
-
-        this.messageAtField = messageAtField;
-    }
-
+    
     private boolean validate(String phoneNumber) {
 
         Pattern validationRegex = Pattern.compile("07\\d{9}");
@@ -68,7 +65,8 @@ public class PhoneNumberValidator {
         Matcher matcher = validationRegex.matcher(phoneNumber);
 
         if (!matcher.matches()) {
-            message = INVALID_PHONE_NUMBER_MESSAGE;
+            message = INVALID_PHONE_NUMBER_MESSAGE_HEADING;
+            messageAtField = INVALID_PHONE_NUMBER_MESSAGE_FIELD;
 
             return false;
         }
