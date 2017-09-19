@@ -17,6 +17,7 @@ public class VehicleDetails implements Serializable {
     @JsonProperty("model")
     private String model;
 
+    @JsonProperty("makeInFull")
     private String makeInFull;
 
     @JsonProperty("primaryColour")
