@@ -41,7 +41,6 @@ public class ResendSmsResource {
 
         String redirectUri;
         boolean resendLimited = !smsConfirmationService.smsSendingNotRestrictedByRateLimiting(
-                motrSession.getVrmFromSession(),
                 motrSession.getPhoneNumberFromSession(),
                 motrSession.getConfirmationIdFromSession());
 

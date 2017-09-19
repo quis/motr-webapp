@@ -43,7 +43,7 @@ public class ResendSmsResourceTest {
     public void smsIsResentOnValidGet() throws Exception {
 
         when(motrSession.isAllowedToResendSmsConfirmationCode()).thenReturn(true);
-        when(smsConfirmationService.smsSendingNotRestrictedByRateLimiting(any(), eq(PHONE_NUMBER), eq(CONFIRMATION_ID)))
+        when(smsConfirmationService.smsSendingNotRestrictedByRateLimiting(eq(PHONE_NUMBER), eq(CONFIRMATION_ID)))
                 .thenReturn(true);
         when(smsConfirmationService.resendSms(any(), any())).thenReturn(SMS_CONFIRMATION_CODE_LINK);
 
@@ -58,7 +58,7 @@ public class ResendSmsResourceTest {
     public void testNoResendOfSms_whenResendIsLimited() throws Exception {
 
         when(motrSession.isAllowedToResendSmsConfirmationCode()).thenReturn(true);
-        when(smsConfirmationService.smsSendingNotRestrictedByRateLimiting(any(), eq(PHONE_NUMBER), eq(CONFIRMATION_ID)))
+        when(smsConfirmationService.smsSendingNotRestrictedByRateLimiting(eq(PHONE_NUMBER), eq(CONFIRMATION_ID)))
                 .thenReturn(false);
         when(smsConfirmationService.resendSms(any(), any())).thenReturn(SMS_CONFIRMATION_CODE_LINK);
         when(urlHelper.phoneConfirmationLink()).thenReturn(SMS_CONFIRMATION_CODE_LINK);

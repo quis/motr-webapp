@@ -77,7 +77,7 @@ public class SmsConfirmationService {
                 EventLogger.logEvent(
                         new SmsConfirmationCreatedEvent().setPhoneNumber(phoneNumber).setConfirmationCode(confirmationCode));
 
-            } else if (smsSendingNotRestrictedByRateLimiting(vrm, phoneNumber, confirmationId)) {
+            } else if (smsSendingNotRestrictedByRateLimiting(phoneNumber, confirmationId)) {
 
                 motrSession.setSmsConfirmResendLimited(false);
                 String confirmationCode = smsConfirmation.get().getCode();
@@ -111,7 +111,8 @@ public class SmsConfirmationService {
 
         if (smsConfirmation.getCode().equals(confirmationCode)
                 && smsConfirmation.getPhoneNumber().equals(phoneNumber)
-                && smsConfirmation.getVrm().equals(vrm)) {
+                && smsConfirmation.getVrm().equals(vrm)
+                && smsConfirmation.getAttempts() < MAX_ATTEMPTS) {
             return Confirmation.CODE_VALID;
         }
 
@@ -127,7 +128,7 @@ public class SmsConfirmationService {
         return Confirmation.CODE_NOT_VALID_MAX_ATTEMPTS_REACHED;
     }
 
-    public boolean smsSendingNotRestrictedByRateLimiting(String vrm, String phoneNumber, String confirmationId)
+    public boolean smsSendingNotRestrictedByRateLimiting(String phoneNumber, String confirmationId)
             throws InvalidConfirmationIdException {
 
         SmsConfirmation smsConfirmation = smsConfirmationRepository.findByConfirmationId(confirmationId)
