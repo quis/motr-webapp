@@ -17,6 +17,8 @@ public class VehicleDetails implements Serializable {
     @JsonProperty("model")
     private String model;
 
+    private String makeInFull;
+
     @JsonProperty("primaryColour")
     private String primaryColour;
 
@@ -61,6 +63,16 @@ public class VehicleDetails implements Serializable {
 
         this.model = model;
     }
+
+    public void setMakeInFull(String makeInFull) {
+
+        this.makeInFull = makeInFull;
+    }
+
+    public String getMakeInFull() {
+        return this.makeInFull;
+    }
+
 
     public String getPrimaryColour() {
 

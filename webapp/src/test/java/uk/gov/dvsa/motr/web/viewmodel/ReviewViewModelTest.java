@@ -9,12 +9,14 @@ import static org.junit.Assert.assertTrue;
 
 public class ReviewViewModelTest {
 
+    private static String UNKNOWN_STRING = "UNKNOWN";
+
     @Test
     public void whenColourIsNullItIsSetToUnknown() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setColour(null, null);
-        assertTrue(viewModel.getColour().equals("Unknown"));
+        assertTrue(viewModel.getColour().equals(UNKNOWN_STRING));
     }
 
     @Test
@@ -22,7 +24,7 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setColour("", null);
-        assertTrue(viewModel.getColour().equals("Unknown"));
+        assertTrue(viewModel.getColour().equals(UNKNOWN_STRING));
     }
 
     @Test
@@ -46,7 +48,7 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setYearOfManufacture(null);
-        assertTrue(viewModel.getYearOfManufacture().equals("Unknown"));
+        assertTrue(viewModel.getYearOfManufacture().equals(UNKNOWN_STRING));
     }
 
     @Test
@@ -54,7 +56,7 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setYearOfManufacture("");
-        assertTrue(viewModel.getYearOfManufacture().equals("Unknown"));
+        assertTrue(viewModel.getYearOfManufacture().equals(UNKNOWN_STRING));
     }
 
     @Test
@@ -62,7 +64,7 @@ public class ReviewViewModelTest {
 
         ReviewViewModel viewModel = new ReviewViewModel();
         viewModel.setExpiryDate(null);
-        assertTrue(viewModel.getExpiryDate().equals("Unknown"));
+        assertTrue(viewModel.getExpiryDate().equals(UNKNOWN_STRING));
     }
 
     @Test
@@ -138,6 +140,44 @@ public class ReviewViewModelTest {
     public void modelIsUnknownWhenNotSet() {
 
         ReviewViewModel viewModel = new ReviewViewModel();
-        assertEquals("Unknown", viewModel.getModel());
+        assertEquals(UNKNOWN_STRING, viewModel.getModel());
     }
+
+    @Test
+    public void whenMakeIsNullAndMakeInFullIsSet_MakeIsReturnedAsMakeInFull() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setMake(null);
+        viewModel.setMakeInFull("Ford Focus 1.8 Tdi");
+        assertEquals("FORD FOCUS 1.8 TDI", viewModel.getMakeInfull());
+    }
+
+    @Test
+    public void whenMakeIsNullAndMakeInFullIsSet_ModelIsReturnedAsEmpty() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setMake(null);
+        viewModel.setMakeInFull("Ford Focus 1.8 TDI");
+        viewModel.setModel("Focus");
+        assertEquals("", viewModel.getModel());
+    }
+
+    @Test
+    public void whenMakeAndMakeInFullIsNull_MakeIsReturnedAsUnknown() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setMake(null);
+        viewModel.setMakeInFull(null);
+        assertEquals(UNKNOWN_STRING, viewModel.getMake());
+    }
+
+    @Test
+    public void whenMakeIsSetAndMakeInFullIsSet_MakeIsReturned() {
+
+        ReviewViewModel viewModel = new ReviewViewModel();
+        viewModel.setMake("Ford");
+        viewModel.setMakeInFull("Ford Focus");
+        assertEquals("FORD", viewModel.getMake());
+    }
+
 }

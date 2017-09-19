@@ -104,6 +104,7 @@ public class ReviewResource {
                     .setExpiryDate(vehicle.getMotExpiryDate())
                     .setMake(vehicle.getMake())
                     .setModel(vehicle.getModel())
+                    .setMakeInFull(vehicle.getMakeInFull())
                     .setRegistration(regNumberFromSession)
                     .setYearOfManufacture(vehicle.getYearOfManufacture() == null ? null : vehicle.getYearOfManufacture().toString());
             map.put("isDvlaVehicle", vehicle.getMotIdentification().getDvlaId().isPresent());
