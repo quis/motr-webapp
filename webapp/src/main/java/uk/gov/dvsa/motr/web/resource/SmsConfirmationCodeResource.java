@@ -128,7 +128,7 @@ public class SmsConfirmationCodeResource {
         modelMap.put(CONFIRMATION_CODE_MODEL_KEY, confirmationCode);
         modelMap.put("continue_button_text", "Continue");
         modelMap.put("resendUrl", "resend");
-        modelMap.put("showInLIne", showInLine);
+        modelMap.put("showInLine", showInLine);
         modelMap.putAll(dataLayerHelper.formatAttributes());
         dataLayerHelper.clear();
 
