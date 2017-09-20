@@ -6,14 +6,20 @@ import uk.gov.dvsa.motr.remote.vehicledetails.VehicleDetails;
 
 public class MakeModelFormatter {
 
-    public static String getMakeModelString(String make, String model) {
+    private static String UNKNOWN_VALUE = "UNKNOWN";
 
-        boolean makeValid = !StringUtils.isNullOrEmpty(make);
-        boolean modelValid = !StringUtils.isNullOrEmpty(model);
+    public static String getMakeModelString(String make, String model, String makeInFull) {
+
+        boolean makeValid = !StringUtils.isNullOrEmpty(make) && !make.equalsIgnoreCase(UNKNOWN_VALUE);
+        boolean modelValid = !StringUtils.isNullOrEmpty(model) && !model.equalsIgnoreCase(UNKNOWN_VALUE);
 
         if (!makeValid && !modelValid) {
-            return "";
+            if (StringUtils.isNullOrEmpty(makeInFull)) {
+                return "";
+            }
+            return makeInFull.toUpperCase();
         }
+
         if (makeValid && !modelValid) {
             return make.toUpperCase();
         }
@@ -30,7 +36,8 @@ public class MakeModelFormatter {
             return "";
         }
 
-        String makeModel = MakeModelFormatter.getMakeModelString(vehicleDetails.getMake(), vehicleDetails.getModel());
+        String makeModel =
+                MakeModelFormatter.getMakeModelString(vehicleDetails.getMake(), vehicleDetails.getModel(), vehicleDetails.getMakeInFull());
 
         if (endDelimeter == null) {
             return makeModel;

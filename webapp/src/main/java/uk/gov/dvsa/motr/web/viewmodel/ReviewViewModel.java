@@ -168,7 +168,8 @@ public class ReviewViewModel {
 
     private boolean useMakeInFull() {
 
-        if (StringUtils.isNullOrEmpty(make) && !StringUtils.isNullOrEmpty(makeInfull)) {
+        if ((StringUtils.isNullOrEmpty(make) || make.equalsIgnoreCase(UNKNOWN_STRING))
+                && !StringUtils.isNullOrEmpty(makeInfull)) {
             return true;
         }
         return false;

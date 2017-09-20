@@ -161,6 +161,7 @@ public class VehicleDetails implements Serializable {
                 ", motExpiryDate=" + motExpiryDate +
                 ", motTestNumber='" + motTestNumber + '\'' +
                 ", dvlaId='" + dvlaId + '\'' +
+                ", makeInFull='" + makeInFull + '\'' +
                 '}';
     }
 }

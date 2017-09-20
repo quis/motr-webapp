@@ -41,4 +41,31 @@ public class MakeModelFormatterTest {
         VehicleDetails vehicleDetails = new VehicleDetails();
         assertEquals("", MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails,null));
     }
+
+    @Test
+    public void whenNoMakeButHasMakeInFull_MakeInFullIsReturned() throws Exception {
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMakeInFull("Ford Focus 1.8 TDCI");
+        assertEquals("FORD FOCUS 1.8 TDCI", MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails,null));
+    }
+
+    @Test
+    public void whenMakeAndModelUnknown_EmptyStringIsReturned() throws Exception {
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMake("UNKNOWN");
+        vehicleDetails.setModel("UNKNOWN");
+        assertEquals("", MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails,null));
+    }
+
+    @Test
+    public void whenMakeAndModelUnknownButHasMakeInFull_MakeInFullIsReturned() throws Exception {
+
+        VehicleDetails vehicleDetails = new VehicleDetails();
+        vehicleDetails.setMake("UNKNOWN");
+        vehicleDetails.setModel("UNKNOWN");
+        vehicleDetails.setMakeInFull("Ford Focus");
+        assertEquals("FORD FOCUS", MakeModelFormatter.getMakeModelDisplayStringFromVehicleDetails(vehicleDetails,null));
+    }
 }
