@@ -22,13 +22,14 @@
 
                     <legend class="visuallyhidden">Choose to have a reminder via email or text message</legend>
 
-                    {{#message}}
-                        <p class="u-space-b15">
-                            <span class="error-message">Chose one reminder you want</span>
-                        </p>
-                    {{/message}}
+                    <div class="form-group {{#message}} form-group-error{{/message}}">
 
-                    <div class="form-group {{#showSystemError}} form-group-error{{/showSystemError}}">
+                        {{#message}}
+                            <span class="u-space-b15">
+                                <span class="error-message">Chose one reminder you want</span>
+                            </span>
+                        {{/message}}
+
                         <div class="multiple-choice">
                             <input id="radio-1" type="radio" name="selectChannel" value="email" {{#if isEmailChecked}}checked="checked"{{/if}}>
                             <label for="radio-1">Email</label>
