@@ -20,10 +20,12 @@
 
                 <fieldset>
 
+                    <legend class="visuallyhidden">Choose to have a reminder via email or text message</legend>
+
                     {{#message}}
-                        <legend class="u-space-b15">
+                        <p class="u-space-b15">
                             <span class="error-message">Chose one reminder you want</span>
-                        </legend>
+                        </p>
                     {{/message}}
 
                     <div class="form-group {{#showSystemError}} form-group-error{{/showSystemError}}">
